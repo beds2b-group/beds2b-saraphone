@@ -1,0 +1,460 @@
+/* =====================================================
+   Senator Hotels & Resorts theme — LIGHT
+   White-dominant, navy accents, warm gold detail
+   Two modes: COMPACT (default mini dialer) + EXPANDED (dashboard)
+   ===================================================== */
+
+:root{
+    --sen-navy:        #0d2538;
+    --sen-navy-2:      #14324b;
+    --sen-navy-3:      #1c4060;
+    --sen-bg:          #f6f3ec;
+    --sen-surface:     #ffffff;
+    --sen-surface-2:   #f1ece1;
+    --sen-line:        rgba(13,37,56,0.10);
+    --sen-line-2:      rgba(13,37,56,0.18);
+    --sen-text:        #0d2538;
+    --sen-text-dim:    #5d6b78;
+    --sen-gold:        #b08a4a;
+    --sen-gold-soft:   #d4b576;
+    --sen-success:     #2e8b6b;
+    --sen-success-2:   #246c54;
+    --sen-danger:      #c0463f;
+    --sen-danger-2:    #9a3833;
+}
+
+html, body{
+    background: var(--sen-bg) !important;
+    background-image:
+        radial-gradient(900px 500px at 50% -10%, rgba(13,37,56,0.05), transparent 60%),
+        linear-gradient(180deg, #f8f5ee 0%, #ece6d8 100%) !important;
+    background-attachment: fixed !important;
+    color: var(--sen-text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+body{ color: var(--sen-text); }
+
+/* ---------- brand strips ---------- */
+.senator-brand{
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 10px 0 6px 0;
+}
+.senator-brand img{
+    width: 72px; height: 72px; border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(13,37,56,0.15);
+    background: var(--sen-navy);
+}
+.senator-brand .senator-tag{
+    color: var(--sen-gold); font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase;
+}
+
+.senator-strip{
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    padding: 10px 16px; margin: 0 0 12px 0;
+    background: var(--sen-navy); border-radius: 12px; color: #fff;
+}
+.senator-strip img{ width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0; }
+.senator-strip .senator-wordmark{ display: flex; flex-direction: column; line-height: 1; text-align: left; }
+.senator-strip .senator-wordmark .wm-name{ font-size: 18px; letter-spacing: 0.32em; font-weight: 600; color: #fff; }
+.senator-strip .senator-wordmark .wm-sub{ font-size: 8px; letter-spacing: 0.30em; color: var(--sen-gold-soft); margin-top: 4px; }
+
+/* ---------- panel surfaces ---------- */
+#webphone_body{
+    background: var(--sen-surface) !important;
+    border: 1px solid var(--sen-line) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 18px 40px rgba(13,37,56,0.10), 0 2px 6px rgba(13,37,56,0.04);
+    color: var(--sen-text) !important;
+    padding: 18px !important;
+}
+#webphone_display{
+    background: var(--sen-surface-2) !important;
+    border: 1px solid var(--sen-line) !important;
+    color: var(--sen-text) !important;
+    border-radius: 14px !important;
+    min-height: 70px; height: auto !important;
+    padding: 12px !important;
+    margin-bottom: 14px;
+}
+#webphone_keypad, #webphone_keypad_right{
+    background: transparent !important;
+    border: none !important;
+    padding: 6px 0 !important;
+}
+#webphone_blf{
+    background: var(--sen-surface) !important;
+    border: 1px solid var(--sen-line) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 18px 40px rgba(13,37,56,0.10);
+    color: var(--sen-text);
+    padding: 18px !important;
+}
+#hideAll{ background-color: var(--sen-bg) !important; color: var(--sen-text); }
+#hideAll h2{ color: var(--sen-text); }
+
+/* form inputs */
+.form-control, input.form-control{
+    background: #fff !important; border: 1px solid var(--sen-line-2) !important;
+    color: var(--sen-text) !important; border-radius: 10px !important; box-shadow: none !important;
+}
+.form-control::placeholder{ color: rgba(13,37,56,0.35) !important; }
+#dialadv1 input, #dialadv2 input, #signinadv1 input{
+    background: #fff !important; color: var(--sen-text) !important;
+    border: 1px solid var(--sen-line-2) !important; border-radius: 6px !important; padding: 4px 8px;
+}
+#signinadv1{ color: var(--sen-text) !important; }
+#signinadv1 td{ color: var(--sen-text-dim) !important; }
+
+/* =====================================================
+   Buttons
+   ===================================================== */
+.btn{
+    border-radius: 10px !important; border: 1px solid transparent !important;
+    transition: transform .08s ease, background .15s ease, box-shadow .15s ease;
+    display: inline-flex !important; align-items: center; justify-content: center;
+    gap: 6px; color: var(--sen-text) !important; text-shadow: none !important;
+}
+.btn:hover{ transform: translateY(-1px); }
+
+/* dialpad number keys — 3-col grid so they never wrap weirdly */
+#webphone_keypad{
+    display: grid !important;
+    grid-template-columns: repeat(3, 56px);
+    grid-auto-rows: 56px;
+    gap: 8px;
+    justify-content: center;
+}
+#webphone_keypad br{ display: none; }
+#webphone_keypad .btn-default{
+    width: 56px !important; height: 56px !important; font-size: 18px !important;
+    background: var(--sen-surface-2) !important;
+    border: 1px solid var(--sen-line) !important; color: var(--sen-navy) !important;
+    margin: 0 !important; box-shadow: 0 1px 0 rgba(13,37,56,0.04);
+}
+#webphone_keypad .sen-actionrow,
+#webphone_keypad .sen-expand-toggle{ grid-column: 1 / -1; height: auto; }
+#webphone_keypad .btn-default:hover{ background: #e4ddca !important; }
+
+/* circular action icon buttons (call/hangup/cancel) */
+.sen-iconbtn{
+    width: 48px !important; height: 48px !important; padding: 0 !important;
+    border-radius: 50% !important;
+    background: var(--sen-navy) !important; border: none !important;
+    box-shadow: 0 6px 14px rgba(13,37,56,0.18);
+}
+.sen-iconbtn svg{ width: 22px; height: 22px; fill: none; stroke: #fff;
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sen-iconbtn.is-call{ background: var(--sen-success) !important; }
+.sen-iconbtn.is-call:hover{ background: var(--sen-success-2) !important; }
+.sen-iconbtn.is-hangup{ background: var(--sen-danger) !important; }
+.sen-iconbtn.is-hangup:hover{ background: var(--sen-danger-2) !important; }
+.sen-iconbtn.is-gold{ background: #fff !important; border: 1px solid var(--sen-line-2) !important; box-shadow: none; }
+.sen-iconbtn.is-gold svg{ stroke: var(--sen-navy); }
+.sen-iconbtn.is-gold:hover{ background: var(--sen-surface-2) !important; }
+
+/* pill icon buttons (right column actions) */
+.sen-pill{
+    width: 80px !important; height: 64px !important; padding: 6px 0 !important;
+    flex-direction: column; gap: 3px !important;
+    border-radius: 14px !important;
+    background: var(--sen-surface-2) !important;
+    border: 1px solid var(--sen-line) !important;
+    font-size: 9px !important; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--sen-text-dim) !important;
+}
+.sen-pill svg{ width: 20px; height: 20px; fill: none; stroke: var(--sen-navy);
+    stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sen-pill:hover{ background: #e4ddca !important; }
+.sen-pill.is-on{ background: var(--sen-navy) !important; color: #fff !important; border-color: var(--sen-navy) !important; }
+.sen-pill.is-on svg{ stroke: #fff; }
+.sen-pill .sen-pill-label{ display:block; }
+.sen-pill.is-danger{ color: var(--sen-danger) !important; border-color: rgba(192,70,63,0.28) !important; }
+.sen-pill.is-danger svg{ stroke: var(--sen-danger); }
+
+/* small text buttons */
+.sen-textbtn{
+    background: #fff !important; border: 1px solid var(--sen-navy) !important;
+    color: var(--sen-navy) !important; border-radius: 999px !important;
+    padding: 6px 18px !important; font-size: 12px !important;
+    letter-spacing: 0.12em; text-transform: uppercase;
+}
+.sen-textbtn:hover{ background: var(--sen-surface-2) !important; }
+.sen-textbtn.is-primary{ background: var(--sen-navy) !important; color: #fff !important; border-color: var(--sen-navy) !important; }
+.sen-textbtn.is-primary:hover{ background: var(--sen-navy-2) !important; color: #fff !important; }
+.sen-textbtn.is-danger{ border-color: var(--sen-danger) !important; color: var(--sen-danger) !important; }
+
+/* expand/collapse toggle */
+.sen-expand-toggle{
+    margin: 10px auto 0 auto !important;
+    background: transparent !important;
+    border: 1px dashed var(--sen-line-2) !important;
+    color: var(--sen-text-dim) !important;
+    font-size: 10px !important; letter-spacing: 0.18em; text-transform: uppercase;
+    border-radius: 999px !important; padding: 6px 14px !important;
+    display: inline-flex !important; align-items: center; gap: 8px;
+}
+.sen-expand-toggle svg{ width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.8;
+    fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s ease; }
+.sen-expand-toggle:hover{ background: var(--sen-surface-2) !important; }
+body.sen-expanded .sen-expand-toggle .sen-expand-label-collapse{ display: inline; }
+body.sen-expanded .sen-expand-toggle .sen-expand-label-expand{ display: none; }
+body:not(.sen-expanded) .sen-expand-toggle .sen-expand-label-collapse{ display: none; }
+body:not(.sen-expanded) .sen-expand-toggle .sen-expand-label-expand{ display: inline; }
+body.sen-expanded .sen-expand-toggle svg.sen-chev{ transform: rotate(180deg); }
+
+/* keypad action row (call + cancel) */
+.sen-actionrow{
+    display: flex; justify-content: center; gap: 16px;
+    margin-top: 8px; margin-bottom: 4px;
+}
+
+/* right column layout — 2-column grid of pills */
+#webphone_keypad_right{
+    display: grid !important;
+    grid-template-columns: repeat(2, auto);
+    justify-content: center; align-content: start;
+    gap: 10px;
+    padding: 8px 0 !important;
+}
+#webphone_keypad_right .sen-row{ display: contents; }
+#webphone_keypad_right .sen-pill.sen-span-2{ grid-column: 1 / -1; justify-self: center; }
+
+/* BLF chips */
+#webphone_blf .btn{
+    width: auto !important; min-width: 130px; height: 30px;
+    font-size: 11px !important; padding: 0 10px !important;
+    background: var(--sen-surface-2) !important;
+    border: 1px solid var(--sen-line) !important;
+    color: var(--sen-text) !important; border-radius: 999px !important;
+}
+#webphone_blf h4{ color: var(--sen-gold); font-size: 11px; letter-spacing: 0.28em;
+    text-transform: uppercase; margin-bottom: 12px; }
+
+/* footer */
+.inner i, .inner p{ color: rgba(13,37,56,0.45) !important; font-size: 11px; letter-spacing: 0.06em; }
+.inner i{ font-style: normal; text-transform: uppercase; letter-spacing: 0.28em; color: var(--sen-gold) !important; }
+
+/* displays */
+#whoami{ color: var(--sen-gold); font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; }
+#calling, #speakingwith{ color: var(--sen-text); }
+
+/* =====================================================
+   COMPACT MODE  (default — small dialer like reference 1)
+   ===================================================== */
+body:not(.sen-expanded) .sen-dash{ display: none !important; }
+
+/* hide BLF and bottom mic list in compact */
+body:not(.sen-expanded) #webphone_blf,
+body:not(.sen-expanded) #dialadv2,
+body:not(.sen-expanded) #asknotificationpermission,
+body:not(.sen-expanded) #dial .inner,
+body:not(.sen-expanded) #dial .row > div[style*="color: #808080"]{
+    display: none !important;
+}
+
+/* compact column widths — only the dialer column is visible */
+body:not(.sen-expanded) .container{ max-width: 620px; padding-top: 16px; }
+body:not(.sen-expanded) #dial .col-6,
+body:not(.sen-expanded) #dial .col-4{
+    flex: 0 0 auto !important; width: auto !important; max-width: none !important;
+}
+body:not(.sen-expanded) .container .col-8{ flex: 0 0 100%; max-width: 100%; }
+body:not(.sen-expanded) .container .col-4{ display: none !important; }
+
+/* inside the dialer panel: left = numpad, right = action pills, stacked under display */
+body:not(.sen-expanded) #dial .row .col-1{ display: none !important; }
+body:not(.sen-expanded) #dial #isNotIncomingcall > .row,
+body:not(.sen-expanded) #dial #isIncomingcall > .row{
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+body:not(.sen-expanded) #dial #webphone_keypad,
+body:not(.sen-expanded) #dial #webphone_keypad_right{
+    flex: 0 0 auto; max-width: none; width: auto;
+}
+body:not(.sen-expanded) .container{ max-width: 320px; }
+body:not(.sen-expanded) #webphone_keypad_right{
+    grid-template-columns: repeat(2, 80px);
+    gap: 8px;
+}
+
+/* =====================================================
+   EXPANDED MODE  (dashboard like reference 2)
+   ===================================================== */
+
+/* visibility of dashboard chrome */
+body.sen-expanded .sen-dash{ display: grid; }
+
+/* full-bleed dashboard layout */
+body.sen-expanded{
+    padding: 0 !important;
+}
+body.sen-expanded .container{
+    max-width: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* The dashboard wrapper sits on top of the existing container */
+.sen-dash{
+    display: grid;
+    grid-template-columns: 300px 1fr 380px;
+    grid-template-rows: auto 1fr;
+    gap: 16px;
+    padding: 16px 20px 24px 20px;
+    min-height: 100vh;
+}
+.sen-dash > .sen-dash-topbar{ grid-column: 1 / -1; }
+.sen-dash > .sen-dash-left   { grid-column: 1; grid-row: 2; }
+.sen-dash > .sen-dash-center { grid-column: 2; grid-row: 2; }
+.sen-dash > .sen-dash-right  { grid-column: 3; grid-row: 2; }
+
+/* card surfaces */
+.sen-card{
+    background: var(--sen-surface);
+    border: 1px solid var(--sen-line);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(13,37,56,0.06);
+    margin-bottom: 14px;
+}
+.sen-card h5{
+    margin: 0 0 12px 0; font-size: 13px; letter-spacing: 0.06em;
+    color: var(--sen-text); font-weight: 600;
+}
+.sen-card h5 .sen-card-sub{
+    float: right; font-weight: 400; color: var(--sen-text-dim);
+    font-size: 11px; letter-spacing: 0.04em;
+}
+.sen-placeholder-line{
+    height: 10px; border-radius: 999px;
+    background: linear-gradient(90deg, var(--sen-surface-2), rgba(241,236,225,0.4));
+    margin: 8px 0;
+}
+.sen-placeholder-line.short{ width: 60%; }
+.sen-placeholder-line.med{ width: 80%; }
+.sen-placeholder-block{
+    min-height: 180px; border-radius: 12px;
+    border: 1px dashed var(--sen-line-2);
+    background: repeating-linear-gradient(45deg, transparent 0 8px, rgba(13,37,56,0.02) 8px 16px);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--sen-text-dim); font-size: 12px; letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* top status bar */
+.sen-topbar{
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--sen-surface);
+    border: 1px solid var(--sen-line);
+    border-radius: 14px;
+    padding: 12px 18px;
+    box-shadow: 0 8px 24px rgba(13,37,56,0.06);
+}
+.sen-topbar-status{
+    display: flex; align-items: center; gap: 10px;
+    color: var(--sen-success); font-weight: 600; font-size: 12px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+}
+.sen-topbar-status .sen-dot{
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--sen-success); box-shadow: 0 0 0 4px rgba(46,139,107,0.18);
+}
+.sen-topbar-brand{
+    display: flex; align-items: center; gap: 10px;
+    color: var(--sen-text);
+}
+.sen-topbar-brand img{ width: 26px; height: 26px; border-radius: 6px; }
+.sen-topbar-brand .sen-topbar-name{ font-weight: 600; letter-spacing: 0.18em; font-size: 12px; }
+.sen-topbar-brand .sen-topbar-pill{
+    background: var(--sen-surface-2); color: var(--sen-text-dim);
+    font-size: 10px; padding: 3px 10px; border-radius: 999px;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-left: 6px;
+}
+.sen-topbar-duration{
+    text-align: right;
+}
+.sen-topbar-duration .lbl{
+    display: block; font-size: 9px; letter-spacing: 0.24em;
+    text-transform: uppercase; color: var(--sen-text-dim);
+}
+.sen-topbar-duration .val{
+    font-size: 22px; font-weight: 700; color: var(--sen-text); font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+}
+
+/* search field placeholder */
+.sen-search{
+    display: flex; align-items: center; gap: 8px;
+    background: var(--sen-surface);
+    border: 1px solid var(--sen-line);
+    border-radius: 12px; padding: 10px 14px;
+    color: var(--sen-text-dim);
+    box-shadow: 0 4px 12px rgba(13,37,56,0.04);
+    margin-bottom: 14px;
+    font-size: 12px;
+}
+.sen-search svg{ width: 14px; height: 14px; stroke: var(--sen-text-dim); fill: none; stroke-width: 1.8; }
+
+/* contact card */
+.sen-contact-row{
+    display: flex; align-items: center; gap: 12px;
+    background: var(--sen-surface-2);
+    border-radius: 12px; padding: 10px 12px; margin-bottom: 10px;
+}
+.sen-contact-avatar{
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--sen-navy); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+}
+.sen-contact-meta{ display: flex; flex-direction: column; gap: 2px; }
+.sen-contact-meta b{ font-size: 13px; }
+.sen-contact-meta span{ font-size: 11px; color: var(--sen-text-dim); }
+
+.sen-kv{ display: flex; flex-direction: column; gap: 4px; padding: 8px 0; border-top: 1px solid var(--sen-line); margin-top: 10px; }
+.sen-kv:first-of-type{ border-top: none; padding-top: 0; margin-top: 0; }
+.sen-kv .k{ font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--sen-text-dim); }
+.sen-kv .v{ font-size: 13px; color: var(--sen-text); }
+
+/* tag chip */
+.sen-link{
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--sen-navy); font-size: 11px; font-weight: 500;
+    cursor: pointer;
+}
+
+/* In expanded mode the existing container slots into the right rail.
+   The dialer view becomes the "Dialer" card; the BLF becomes "Team Status". */
+body.sen-expanded .container > div[align="center"]{ display: block !important; }
+body.sen-expanded .container .form-signin{ max-width: none !important; }
+body.sen-expanded .container .row{ flex-direction: column; }
+body.sen-expanded .container .col-8,
+body.sen-expanded .container .col-4{
+    flex: 0 0 100% !important; max-width: 100% !important;
+}
+body.sen-expanded .senator-strip{ display: none !important; }
+body.sen-expanded #dial .inner,
+body.sen-expanded #dial .row > div[style*="color: #808080"]{ display: none !important; }
+body.sen-expanded #asknotificationpermission{ display: none !important; }
+body.sen-expanded #dialadv2{ display: none !important; }
+body.sen-expanded #webphone_blf{ max-height: 320px; overflow-y: auto; }
+
+/* The container, when moved into .sen-dash-right by JS, fills its rail */
+body.sen-expanded .sen-dash-right .container{
+    width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important;
+}
+body.sen-expanded .sen-dash-right #webphone_body{
+    padding: 14px !important;
+}
+body.sen-expanded .sen-dash-right #webphone_keypad{
+    grid-template-columns: repeat(3, 50px);
+    grid-auto-rows: 50px;
+    gap: 6px;
+}
+body.sen-expanded .sen-dash-right #webphone_keypad .btn-default{
+    width: 50px !important; height: 50px !important; font-size: 16px !important; margin: 0 !important;
+}
+body.sen-expanded .sen-dash-right .sen-pill{ width: 54px !important; height: 54px !important; }
+body.sen-expanded .sen-dash-right #webphone_keypad_right{ gap: 8px; }
+body.sen-expanded .sen-expand-toggle{ display: none !important; }
