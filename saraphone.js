@@ -57,6 +57,7 @@ var dtmf_options = {
   'interToneGap': 100
 };
 
+
 //http://jsfiddle.net/55Kfu/1506/
 //https://stackoverflow.com/posts/13194087/revisions
 var beep = (function() {
@@ -1133,14 +1134,27 @@ var cacheItems = ['login', 'passwd', 'yourname', 'domain', 'proxy', 'port',
     'pres8', 'pres8_label',
     'pres9', 'pres9_label',
     'pres10', 'pres10_label',
-
 ];
 
 function setupCacheHandler() {
-    for(var i = 0; i < cacheItems.length; i++) {
+    for (var i = 0; i < cacheItems.length; i++) {
         var key = cacheItems[i];
-        var value = localStorage.getItem("saraphone." + key);
-        if (value) document.getElementById(key).value = value;
-        $("#" + key).change(function(e) {localStorage.setItem("saraphone." + e.target.id, e.target.value);});
+
+        // 1. Si hay valor en localStorage, tiene prioridad (el usuario lo cambió manualmente)
+        var cachedValue = localStorage.getItem("saraphone." + key);
+        if (cachedValue) {
+            document.getElementById(key).value = cachedValue;
+
+        // 2. Si no hay valor en localStorage pero existe config.js, cargarlo desde ahí
+        } else if (typeof SARAPHONE_CONFIG !== 'undefined' && SARAPHONE_CONFIG[key] !== undefined) {
+            document.getElementById(key).value = SARAPHONE_CONFIG[key];
+            // También lo guardamos en localStorage para futuras visitas
+            localStorage.setItem("saraphone." + key, SARAPHONE_CONFIG[key]);
+        }
+
+        // 3. Seguimos guardando los cambios del usuario en localStorage como antes
+        $("#" + key).change(function(e) {
+            localStorage.setItem("saraphone." + e.target.id, e.target.value);
+        });
     }
 }
