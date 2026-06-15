@@ -1,9 +1,9 @@
 /* background */
 html, body{
-    background: -moz-linear-gradient(top, #6c89b5 0%, #144794 100%);
+    /* background: -moz-linear-gradient(top, #6c89b5 0%, #144794 100%); */
     /*background: rgb(108,137,181);*/
-	background: rgba(20,71,148,1);
-    background: linear-gradient(180deg, rgba(108,137,181,1) 0%, rgba(20,71,148,1) 100%);
+    /* background: linear-gradient(180deg, rgba(108,137,181,1) 0%, rgba(20,71,148,1) 100%); */
+	background: rgb(255, 255, 255);
     background-repeat: no-repeat;
     background-attachment: fixed;
     webkit-background-size:cover;
@@ -85,7 +85,6 @@ input.btn:hover, input.btn:active, input.btn:focus, input.button:hover,	input.bu
     width: 48px !important;
     height: 48px !important;
     font-size: 20px;
-    font-weight: bold;
 }
 
 /* webphone */
@@ -94,40 +93,31 @@ input.btn:hover, input.btn:active, input.btn:focus, input.button:hover,	input.bu
     border-style: solid;
     border-width: 1px;
     border-radius: 15px;
-    border-color: #292929;
-    background: #333;
+    background: #ffffff;
     padding: 15px;
     margin-bottom: 10px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
 }
 #webphone_display{
-    background-color: #808080;
     margin-bottom: 10px;
     padding-top: 5px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #292929;
-    border-radius: 15px;
     height: 120px;
+    display: flex;
 }
 #webphone_keypad{
-    border-style: inset;
-    border-width: 1px;
-    border-radius: 15px;
-    border-color: #292929;
-    background: -moz-linear-gradient(top, #616161 0%, #333 100%);
-    background: rgb(97,97,97);
-    background: linear-gradient(180deg, rgba(97,97,97,1) 0%, rgba(51,51,51,1) 100%);
-    padding: 20px 0px 0px 0px;
-    margin:0px 5px 5px 5px;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 16px;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+
+    background: #ffffff;
+    border-radius: 22px;
 }
 #webphone_keypad_right{
-    border-style: inset;
-    border-width: 1px;
-    border-radius: 15px;
-    border-color: #292929;
-    background: -moz-linear-gradient(top, #616161 0%, #333 100%);
-    background: rgb(97,97,97);
-    background: linear-gradient(180deg, rgba(97,97,97,1) 0%, rgba(51,51,51,1) 100%);
     padding: 20px 0px 5px 0px;
     margin: 0px 5px 5px 5px;
 }
@@ -150,4 +140,264 @@ input.btn:hover, input.btn:active, input.btn:focus, input.button:hover,	input.bu
    bottom: 0px; 
    background-color: white;
    z-index: 99; /* Higher than anything else in the document */
+}
+
+.webphone-profile-notifications img {
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+}
+
+.webphone-profile-image {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    margin-left: 15px;
+    margin-right: 15px;
+    background-color: #3f8cff;
+}
+
+.webphone-profile-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-status {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.profile-status p {
+    color: #2f343b;
+}
+
+.status-indicator {
+    width: 7.5px;
+    height: 7.5px;
+    border-radius: 50%;
+    background-color: rgb(29, 252, 29);
+    margin-right: 7px;
+}
+
+.calling-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.webphone-actions-panel {
+    display: flex;
+    align-self: center;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 10px auto;
+}
+
+.webphone-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.webphone-icon-btn {
+    width: 100% !important;
+    height: 52px !important;
+
+    padding: 6px 4px !important;
+    margin: 0 !important;
+
+    border: none !important;
+    border-radius: 10px !important;
+
+    background: #f4f7fa !important;
+    color: #4b5560 !important;
+
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: none !important;
+    cursor: pointer;
+
+    transition: all 0.15s ease;
+}
+
+.webphone-icon-btn:hover {
+    background: #e9eef3 !important;
+    transform: translateY(-1px);
+}
+
+.webphone-icon-btn:active {
+    transform: scale(0.96);
+}
+
+.webphone-icon-btn img {
+    width: 18px;
+    height: 18px;
+    max-width: 18px;
+    max-height: 18px;
+    object-fit: contain;
+    pointer-events: none;
+    margin-bottom: 4px;
+}
+
+.webphone-icon-btn span {
+    display: block;
+    max-width: 100%;
+
+    font-size: 9px;
+    line-height: 10px;
+    font-weight: 600;
+
+    color: #6f7a86;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vmail-wrapper {
+    position: relative;
+}
+
+.vmail-count {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+
+    font-size: 9px;
+    font-weight: bold;
+
+    background: white;
+    color: #d84b4b;
+
+    border-radius: 8px;
+    padding: 0 4px;
+    line-height: 14px;
+}
+
+.webphone-keypad,
+#webphone_keypad {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 0 16px 16px 16px;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    justify-items: stretch;
+}
+
+#webphone_keypad .dial-key {
+    width: 100%;
+    height: 58px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: #f4f7fa;
+    color: #2f343b;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+
+    box-shadow: none;
+    transition: all 0.15s ease;
+}
+
+#webphone_keypad .dial-key:hover {
+    background: #e9eef3;
+    transform: translateY(-1px);
+}
+
+#webphone_keypad .dial-key:active {
+    transform: scale(0.96);
+}
+
+#webphone_keypad .dial-number {
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 20px;
+}
+
+#webphone_keypad .dial-letters {
+    margin-top: 5px;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    color: #9aa3ad;
+    letter-spacing: 0.5px;
+}
+
+#webphone_keypad .dial-actions {
+    width: 100%;
+    grid-column: 1 / 4;
+
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 10px;
+
+    margin-top: 6px;
+}
+
+#webphone_keypad .dial-cancel,
+#webphone_keypad .dial-call {
+    height: 50px;
+
+    border: none;
+    border-radius: 12px;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+#webphone_keypad .dial-cancel {
+    background: #ffe9e9;
+    color: #d84b4b;
+}
+
+#webphone_keypad .dial-call {
+    background: #39aa68;
+    color: white;
+    box-shadow: 0 8px 16px rgba(57, 170, 104, 0.28);
+}
+
+#webphone_keypad .dial-cancel:hover {
+    background: #ffdada;
+}
+
+#webphone_keypad .dial-call:hover {
+    background: #329b5e;
+}
+
+#webphone_keypad .dial-cancel:active,
+#webphone_keypad .dial-call:active {
+    transform: scale(0.96);
+}
+
+.btn-dial {
+    background-color: #e6e6e6;
+    width: 65px !important;
+    height: 48px !important;
+
+    border-radius: 10px;
+    border: none;
+
+    color: #000;
+    font-size: 20px;
 }
