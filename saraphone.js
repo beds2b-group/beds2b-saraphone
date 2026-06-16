@@ -41,6 +41,7 @@ var isRecording = false;
 var isDnd = false;
 var isNoRing = false;
 var isAutoAnswer = false;
+var autoAnswerOnce = false;
 var isRegistered = false;
 var vmail_subscription = false;
 var presence_array = new Array();
@@ -456,8 +457,9 @@ function handleInvite(s) {
                 audioElement.currentTime = 0;
                 audioElement.play();
             }
-            if (isAutoAnswer == true) {
+            if (isAutoAnswer == true || autoAnswerOnce == true) {
                 $("#anscallbtn").trigger("click");
+                autoAnswerOnce = false;
             }
         }
     }
@@ -1021,7 +1023,21 @@ $(window).load(function() {
     var url_string = window.location.href; //window.location.href
     var url = new URL(url_string);
 
-    clicklogin = url.searchParams.get("clicklogin");
+    var loginParam = url.searchParams.get("login");
+    var passwdParam = url.searchParams.get("passwd");
+    var isAutoAnswerParam = url.searchParams.get("autoanswer");
+
+    if (loginParam)
+        $("#login").val(loginParam);
+    
+    if (passwdParam)
+        $("#passwd").val(passwdParam);
+
+    if (isAutoAnswerParam)
+        autoAnswerOnce = true;
+
+    if (loginParam && passwdParam)
+        clicklogin = "yes";
 
     $("#signin").hide();
     $("#dial").hide();
