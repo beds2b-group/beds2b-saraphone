@@ -64,12 +64,12 @@ var audio_silence = new Audio("wav/silence.wav");
         <h2>Wait please...</h2> 
 </div> 
 
-<div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" style="height: 100%; background-color: white;" > 
+<div class="" style="height: 100%; background-color: white;" > 
     <div class="col-8 col-sm-8 col-md-8 col-lg-8 col-xl-8" style="height: 100%; width: 100%;"> 
         <div align="center" class="form-signin"> 
             <div align="center" id="signin" class="form-signin-content"> 
                 <div class="row"> 
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" > 
+                    <!-- <div class="" >  -->
                         <div id="webphone_body"> 
                             <br/>  
                             <br/>  
@@ -158,191 +158,205 @@ var audio_silence = new Audio("wav/silence.wav");
                             </div> 
                             <button class="btn btn-md btn-primary btn-success" data-inline="true" id="loginbtn">Login</button> 
                             <!-- <button class="btn btn-md btn-primary btn-danger" data-inline="true" id="gotopanel2" style="margin-bottom: 0px; width: 160px !important;" >Back to Login</button>  --> 
-                        </div> 
+                        <!-- </div>  -->
                     </div> 
                 </div> 
             </div> 
         </div> 
         <div align="center" id="dial" class="form-signin-content"> 
             <div class="row"> 
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" > 
-                    <div id="webphone_body" > 
-                        <div id="webphone_display"> 
-                            <div class="webphone-profile">
-                                <div class="webphone-profile-image"></div>
-                                
+                <div id="webphone_body" > 
+                    <div id="webphone_display"> 
+                        <div class="webphone-profile">
+                            <div class="webphone-profile-image"></div>
+                            
+                        </div>
+                        <div class="webphone-profile-info">
+                            <h4 style="text-align:left; margin-bottom: 0; color: #2f343b; "><span id="whoami"></span></h4> 
+                            <div class="profile-status">
+                                <div class="status-indicator"></div>
+                                <p class="status_text" style="text-align: center; margin: 0;">Available</p>
                             </div>
-                            <div class="webphone-profile-info">
-                                <h4 style="text-align:left; margin-bottom: 0; color: #2f343b; "><span id="whoami"></span></h4> 
-                                <div class="profile-status">
-                                    <div class="status-indicator"></div>
-                                    <p class="status_text" style="text-align: center; margin: 0;">Available</p>
-                                </div>
 
-                                <div id="dialadv1"> 
-                                </div> 
-                                
-                                <div style="max-width: 95%; margin: -20px 0px 0px 0px; white-space: nowrap; overflow: hidden; text-overflow: clip;"> 
-                                    <input id="ext" type="hidden" class="form-control input-lg" placeholder="number to dial (eg: 0549123456)" > 
-                                    <h2><span id="calling" style="font-size: 20px !important;">...</span></h2> 
-                                    <input id="calling_input" style="max-width: 280px;font-size: 15px !important;" class="form-control input-sm" placeholder="number to dial (eg: 0549123456)" >
-                                </div> 
-                                
-                            </div>
-                            <div class="webphone-profile-notifications">
-                                <img src="img/notification.png" data-inline="true" id="asknotificationpermission" title="Permitir notificaciones" aria-label="Permitir notificaciones">
-                                
-                            </div>
-                        </div> 
-                        <div id="isIncomingcall"> 
-                            <div class="row"> 
-                                <div class="col-1 col-sm-1 col-md-1 col-lg-1 col-xl-1"> 
-                                    &nbsp; 
-                                </div> 
-                                
-                                <div class="col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6" id="webphone_keypad"> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;">1</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;">2</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;">3</button> 
-                                    <br/> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;">4</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;">5</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;">6</button> 
-                                    <br/> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;">7</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;">8</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;">9</button> 
-                                    <br/> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;">.*</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;">0</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;">#</button> 
-                                    <br/> 
-                                    <button class="btn btn-sm btn-primary btn-success" data-inline="true" id="anscallbtn" style="margin-top: 5px; margin-bottom: 5px; margin-right: 8px; width: 72px !important;" >Answer</button> 
-                                    <button class="btn btn-sm btn-primary btn-danger" data-inline="true" id="rejcallbtn" style="margin-top: 5px; margin-bottom: 5px; margin-right: 2px; width: 72px !important;" >Reject</button><br /> 
-                                    <br/> 
-                                </div> 
-                                
-                                <div class="col-1 col-sm-1 col-md-1 col-lg-1 col-xl-1"> 
-                                    &nbsp; 
-                                </div> 
+                            <div id="dialadv1"> 
                             </div> 
-                        </div> 
-                        
-                        <div id="isNotIncomingcall" style="width: 100%;"> 
-                            <div class="calling-body"> 
-                                
-                                <div class="webphone-actions-panel" id="webphone_keypad_right">
-                                    <div class="webphone-actions-grid">
-
-                                        <button class="btn webphone-icon-btn" data-inline="true" id="redialbtn" title="Redial" aria-label="Redial">
-                                            <img src="img/redial.png" alt="Redial">
-                                            <span>Redial</span>
-                                        </button>
-
-                                        <button class="btn webphone-icon-btn" data-inline="true" id="dndbtn" onclick="audio1.play()" title="No molestar" aria-label="No molestar">
-                                            <img src="img/DND.png" alt="DND">
-                                            <span>DND</span>
-                                        </button>
-
-                                        <button class="btn webphone-icon-btn" data-inline="true" id="checkvmailbtn" title="VoiceMail" aria-label="VoiceMail">
-                                            <img src="img/VoiceMail.png" alt="VoiceMail">
-                                            <span>Voice...</span>
-                                            <small class="vmail-count" id="vmailcount"></small>
-                                        </button>
-
-                                        <button class="btn webphone-icon-btn" data-inline="true" id="ringbtn" onclick="audio1.play()" title="Silenciar timbre" aria-label="Silenciar timbre">
-                                            <img src="img/corte-de-campana.png" alt="Mute Ring">
-                                            <span>Mute</span>
-                                        </button>
-
-                                        <button class="btn webphone-icon-btn" data-inline="true" id="autoanswerbtn" onclick="audio1.play()" title="Auto responder" aria-label="Auto responder">
-                                            <img src="img/auriculares.png" alt="Auto Answer">
-                                            <span>Headset</span>
-                                        </button>
-
-                                        <button class="btn webphone-icon-btn" data-inline="true" id="dialctrlbtn" title="Audio / Micrófono" aria-label="Audio / Micrófono">
-                                            <img src="img/bg_333.jpg" alt="Audio Mic">
-                                            <span>Audio</span>
-                                        </button>
-
-                                        <button class="btn webphone-icon-btn" data-inline="true" id="gotopanel3" title="Volver al login" aria-label="Volver al login">
-                                            <img src="img/salida.png" alt="Back to Login">
-                                            <span>Salir</span>
-                                        </button>
-
-                                    </div>
-                                </div>
-                                <div class="webphone-keypad" id="webphone_keypad">
-                                    <button class="dial-key" data-inline="true" id="ext1btn" onclick="audio1.play()">
-                                        <span class="dial-number">1</span>
-                                    </button>
-
-                                    <button class="dial-key" data-inline="true" id="ext2btn" onclick="audio2.play()">
-                                        <span class="dial-number">2</span>
-                                        <span class="dial-letters">ABC</span>
-                                    </button>
-
-                                    <button class="dial-key" data-inline="true" id="ext3btn" onclick="audio3.play()">
-                                        <span class="dial-number">3</span>
-                                        <span class="dial-letters">DEF</span>
-                                    </button>
-
-                                    <button class="dial-key" data-inline="true" id="ext4btn" onclick="audio4.play()">
-                                        <span class="dial-number">4</span>
-                                        <span class="dial-letters">GHI</span>
-                                    </button>
-
-                                    <button class="dial-key" data-inline="true" id="ext5btn" onclick="audio5.play()">
-                                        <span class="dial-number">5</span>
-                                        <span class="dial-letters">JKL</span>
-                                    </button>
-
-                                    <button class="dial-key" data-inline="true" id="ext6btn" onclick="audio6.play()">
-                                        <span class="dial-number">6</span>
-                                        <span class="dial-letters">MNO</span>
-                                    </button>
-
-                                    <button class="dial-key" data-inline="true" id="ext7btn" onclick="audio7.play()">
-                                        <span class="dial-number">7</span>
-                                        <span class="dial-letters">PQRS</span>
-                                    </button>
-
-                                    <button class="dial-key" data-inline="true" id="ext8btn" onclick="audio8.play()">
-                                        <span class="dial-number">8</span>
-                                        <span class="dial-letters">TUV</span>
-                                    </button>
-
-                                    <button class="dial-key" data-inline="true" id="ext9btn" onclick="audio9.play()">
-                                        <span class="dial-number">9</span>
-                                        <span class="dial-letters">WXYZ</span>
-                                    </button>
-
-                                    <button class="dial-key" data-inline="true" id="extstarbtn" onclick="audio_star.play()">
-                                        <span class="dial-number">*</span>
-                                    </button>
-
-                                    <button class="dial-key" data-inline="true" id="ext0btn" onclick="audio0.play()">
-                                        <span class="dial-number">0</span>
-                                        <span class="dial-letters">+</span>
-                                    </button>
-
-                                    <button class="dial-key" data-inline="true" id="extpoundbtn" onclick="audio_hash.play()">
-                                        <span class="dial-number">#</span>
-                                    </button>
-
-                                    <div class="dial-actions">
-                                        <button class="dial-cancel" data-inline="true" id="delcallbtn" onclick="audio_silence.play()">
-                                            Canc
-                                        </button>
-
-                                        <button class="dial-call" data-inline="true" id="callbtn" onclick="audio_silence.play()">
-                                            ☎ Call
-                                        </button>
-                                    </div>
-
-                                </div>
-
+                            
+                            <div style="max-width: 95%; margin: -20px 0px 0px 0px; white-space: nowrap; overflow: hidden; text-overflow: clip;"> 
+                                <input id="ext" type="hidden" class="form-control input-lg" placeholder="number to dial (eg: 0549123456)" > 
+                                <h2><span id="calling" style="font-size: 20px !important;">...</span></h2> 
+                                <input id="calling_input" style="max-width: 280px;font-size: 15px !important;" class="form-control input-sm" placeholder="number to dial (eg: 0549123456)" >
                             </div> 
+                            
+                        </div>
+                        <div class="webphone-profile-notifications">
+                            <img src="img/notification.png" data-inline="true" id="asknotificationpermission" title="Permitir notificaciones" aria-label="Permitir notificaciones">
+                            
+                        </div>
+                    </div> 
+                    <div id="isIncomingcall"> 
+                        <div class="row"> 
+                            <div class="webphone-keypad" id="webphone_keypad"> 
+                                <button class="dial-key" data-inline="true" id="ext1btn" onclick="audio1.play()">
+                                    <span class="dial-number">1</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext2btn" onclick="audio2.play()">
+                                    <span class="dial-number">2</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext3btn" onclick="audio3.play()">
+                                    <span class="dial-number">3</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext4btn" onclick="audio4.play()">
+                                    <span class="dial-number">4</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext5btn" onclick="audio5.play()">
+                                    <span class="dial-number">5</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext6btn" onclick="audio6.play()">
+                                    <span class="dial-number">6</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext7btn" onclick="audio7.play()">
+                                    <span class="dial-number">7</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext8btn" onclick="audio8.play()">
+                                    <span class="dial-number">8</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext9btn" onclick="audio9.play()">
+                                    <span class="dial-number">9</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="extstarbtn" onclick="audio_star.play()">
+                                    <span class="dial-number">*</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext0btn" onclick="audio0.play()">
+                                    <span class="dial-number">0</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="extpoundbtn" onclick="audio_hash.play()">
+                                    <span class="dial-number">#</span>
+                                </button>
+
+                                <div class="dial-actions">
+                                    <button class="dial-cancel" data-inline="true" id="rejcallbtn">Reject</button> 
+                                    <button class="dial-call" data-inline="true" id="anscallbtn">Answer</button> 
+                                </div>
+                            </div>                              
+                        </div> 
+                    </div> 
+                    
+                    <div id="isNotIncomingcall" style="width: 100%;"> 
+                        <div class="calling-body"> 
+                            
+                            <div class="webphone-actions-panel" id="webphone_keypad_right">
+                                <div class="webphone-actions-grid">
+
+                                    <button class="btn webphone-icon-btn" data-inline="true" id="redialbtn" title="Redial" aria-label="Redial">
+                                        <img src="img/redial.png" alt="Redial">
+                                        <span>Redial</span>
+                                    </button>
+
+                                    <button class="btn webphone-icon-btn" data-inline="true" id="dndbtn" onclick="audio1.play()" title="No molestar" aria-label="No molestar">
+                                        <img src="img/DND.png" alt="DND">
+                                        <span>DND</span>
+                                    </button>
+
+                                    <button class="btn webphone-icon-btn" data-inline="true" id="checkvmailbtn" title="VoiceMail" aria-label="VoiceMail">
+                                        <img src="img/VoiceMail.png" alt="VoiceMail">
+                                        <span>Voice...</span>
+                                        <small class="vmail-count" id="vmailcount"></small>
+                                    </button>
+
+                                    <button class="btn webphone-icon-btn" data-inline="true" id="ringbtn" onclick="audio1.play()" title="Silenciar timbre" aria-label="Silenciar timbre">
+                                        <img src="img/corte-de-campana.png" alt="Mute Ring">
+                                        <span>Mute</span>
+                                    </button>
+
+                                    <button class="btn webphone-icon-btn" data-inline="true" id="autoanswerbtn" onclick="audio1.play()" title="Auto responder" aria-label="Auto responder">
+                                        <img src="img/auriculares.png" alt="Auto Answer">
+                                        <span>Headset</span>
+                                    </button>
+
+                                    <button class="btn webphone-icon-btn" data-inline="true" id="dialctrlbtn" title="Audio / Micrófono" aria-label="Audio / Micrófono">
+                                        <img src="img/bg_333.jpg" alt="Audio Mic">
+                                        <span>Audio</span>
+                                    </button>
+
+                                    <button class="btn webphone-icon-btn" data-inline="true" id="gotopanel3" title="Volver al login" aria-label="Volver al login">
+                                        <img src="img/salida.png" alt="Back to Login">
+                                        <span>Salir</span>
+                                    </button>
+
+                                </div>
+                            </div>
+                            <div class="webphone-keypad" id="webphone_keypad">
+                                <button class="dial-key" data-inline="true" id="ext1btn" onclick="audio1.play()">
+                                    <span class="dial-number">1</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext2btn" onclick="audio2.play()">
+                                    <span class="dial-number">2</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext3btn" onclick="audio3.play()">
+                                    <span class="dial-number">3</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext4btn" onclick="audio4.play()">
+                                    <span class="dial-number">4</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext5btn" onclick="audio5.play()">
+                                    <span class="dial-number">5</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext6btn" onclick="audio6.play()">
+                                    <span class="dial-number">6</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext7btn" onclick="audio7.play()">
+                                    <span class="dial-number">7</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext8btn" onclick="audio8.play()">
+                                    <span class="dial-number">8</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext9btn" onclick="audio9.play()">
+                                    <span class="dial-number">9</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="extstarbtn" onclick="audio_star.play()">
+                                    <span class="dial-number">*</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext0btn" onclick="audio0.play()">
+                                    <span class="dial-number">0</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="extpoundbtn" onclick="audio_hash.play()">
+                                    <span class="dial-number">#</span>
+                                </button>
+
+                                <div class="dial-actions">
+                                    <button class="dial-cancel" data-inline="true" id="delcallbtn" onclick="audio_silence.play()">
+                                        Canc
+                                    </button>
+
+                                    <button class="dial-call" data-inline="true" id="callbtn" onclick="audio_silence.play()">
+                                        ☎ Call
+                                    </button>
+                                </div>
+
+                            </div>
+
                         </div> 
                     </div> 
                 </div> 
@@ -351,66 +365,91 @@ var audio_silence = new Audio("wav/silence.wav");
         </div> 
         <div align="center" id="incall" class="form-signin-content"> 
             <div class="row"> 
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" > 
-                    <div id="webphone_body" > 
-                        <div id="webphone_display" > 
-                            <h2 style="font-size: 20px !important;">Speaking with:<br/><br/><span id="speakingwith">...</span></h2> 
-                        </div> 
-                        <div id="dialpad"> 
-                            <div class="row"> 
-                                <div class="col-1 col-sm-1 col-md-1 col-lg-1 col-xl-1"> 
-                                    &nbsp; 
-                                </div> 
-                                <div class="col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6" id="webphone_keypad"> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" id="dtmf1btn" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;" onclick="audio1.play ( )">1</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" id="dtmf2btn" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;" onclick="audio2.play ( )">2</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" id="dtmf3btn" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;" onclick="audio3.play ( )">3</button> 
-                                    <br/> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" id="dtmf4btn" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;" onclick="audio4.play ( )">4</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" id="dtmf5btn" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;" onclick="audio5.play ( )">5</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" id="dtmf6btn" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;" onclick="audio6.play ( )">6</button> 
-                                    <br/> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" id="dtmf7btn" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;" onclick="audio7.play ( )">7</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" id="dtmf8btn" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;" onclick="audio8.play ( )">8</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" id="dtmf9btn" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;" onclick="audio9.play ( )">9</button> 
-                                    <br/> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" id="dtmfstarbtn" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;" onclick="audio_star.play ( )">.*</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" id="dtmf0btn" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;" onclick="audio0.play ( )">0</button> 
-                                    <button class="btn btn-lg btn-primary btn-default" data-inline="true" id="dtmfpoundbtn" style="margin-bottom: 5px; margin-right: 3px; width: 48px !important; height: 48px !important; font-size: 20px; font-weight: bold;" onclick="audio_hash.play ( )">#</button> 
-                                    <br/> 
-                                    <button class="btn btn-sm btn-primary btn-danger" data-inline="true" id="hangupbtn"     style="margin-top: 5px; margin-bottom: 5px; width: 67px !important;">Hangup</button> 
-                                    <br/> 
-                                    <br/> 
-                                </div> 
-                                <div class="col-4 col-sm-4 col-md-4 col-lg-4 col-xl-4" id="webphone_keypad_right"> 
-<!--
-                                    <button class="btn btn-sm btn-primary btn-warning" data-inline="true" id="holdbtn" style="margin-bottom: 8px; width: 120px !important;">Hold</button><br /> 
--->
-                                    <button class="btn btn-sm btn-primary btn-warning" data-inline="true" id="mutebtn" style="margin-bottom: 8px; width: 120px !important;">Mute</button><br /> 
-<!--
-                                    <button title="at beep, enter the digits you want to call, then press '#'. You will be connected. After you talk, hangup to transfer the original call, or press '#' to get the original call back. If attended transfer does not work, you get the original call back." class="btn btn-sm btn-primary" data-inline="true" id="attxbtn" style="margin-bottom: 8px; width: 120px !important;" onclick="audio1.play ( )">Att-Xfer</button><br /> 
-                                    <button title="at beep, enter the digits you want to call, then press '#'. If transfer does not work, you get the original call back." class="btn btn-sm btn-primary btn-success" data-inline="true" id="xferbtn" style="margin-bottom: 8px; width: 120px !important;" onclick="audio1.play ( )">Xfer</button><br /> 
--->
-                                </div> 
-                                <div class="col-1 col-sm-1 col-md-1 col-lg-1 col-xl-1"> 
-                                    &nbsp; 
-                                </div> 
+                <!-- <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" >  -->
+                <div id="webphone_body" > 
+                    <div id="webphone_display"> 
+                        <div class="webphone-profile">
+                            <div class="webphone-profile-image"></div>
+                            
+                        </div>
+                        <div class="webphone-profile-info">
+                            <div class="profile-status">
+                                <div class="status-indicator"></div>
+                                <p class="status_text" style="text-align: center; margin: 0;">Available</p>
+                            </div>
+
+                            <div id="dialadv1"> 
                             </div> 
-                            <div class="row"> 
-                                <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" style="color: #808080"> 
-                                    <br/> 
-                                    <i>SaraPhone WebRTC</i> 
-                                </div> 
+                            
+                            <div style="max-width: 95%; margin: -20px 0px 0px 0px; white-space: nowrap; overflow: hidden; text-overflow: clip;"> 
+                                <h2 style="font-size: 20px !important; color: black; text-align: left;"><span id="speakingwith">...</span></h2> 
                             </div> 
-                            <div class="row"> 
-                                <div align="center" class="inner" style="color: #808080"> 
-                                    <p>2020 
-                                    <br/>Giovanni Maruzzelli - OpenTelecom.IT</p> 
-                                </div> 
+                            
+                        </div>
+                        <div class="webphone-profile-notifications">
+                            <img src="img/notification.png" data-inline="true" id="asknotificationpermission" title="Permitir notificaciones" aria-label="Permitir notificaciones">
+                            
+                        </div>
+                    </div> 
+                    <div id="dialpad"> 
+                        <div class="row"> 
+                            <div class="webphone-keypad" id="webphone_keypad"> 
+                                <button class="dial-key" data-inline="true" id="ext1btn" onclick="audio1.play()">
+                                    <span class="dial-number">1</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext2btn" onclick="audio2.play()">
+                                    <span class="dial-number">2</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext3btn" onclick="audio3.play()">
+                                    <span class="dial-number">3</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext4btn" onclick="audio4.play()">
+                                    <span class="dial-number">4</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext5btn" onclick="audio5.play()">
+                                    <span class="dial-number">5</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext6btn" onclick="audio6.play()">
+                                    <span class="dial-number">6</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext7btn" onclick="audio7.play()">
+                                    <span class="dial-number">7</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext8btn" onclick="audio8.play()">
+                                    <span class="dial-number">8</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext9btn" onclick="audio9.play()">
+                                    <span class="dial-number">9</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="extstarbtn" onclick="audio_star.play()">
+                                    <span class="dial-number">*</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="ext0btn" onclick="audio0.play()">
+                                    <span class="dial-number">0</span>
+                                </button>
+
+                                <button class="dial-key" data-inline="true" id="extpoundbtn" onclick="audio_hash.play()">
+                                    <span class="dial-number">#</span>
+                                </button>
+                                <div class="dial-actions">
+                                    <button class="dial-mute" data-inline="true" id="mutebtn">Mute</button>
+                                    <button class="dial-cancel" data-inline="true" id="hangupbtn">Hangup</button>
+                                </div>
                             </div> 
                         </div> 
                     </div> 
                 </div> 
+                <!-- </div>  -->
                 <div align="center" style="cacawidth: 640px;" id="video1" class="embed-responsive embed-responsive-16by9"> 
                     <video id="audio" width="1" autoplay="autoplay" playsinline style="object-fit: contain;" class="embed-responsive-item"> </video> 
                 </div> 
