@@ -58,6 +58,101 @@ var dtmf_options = {
   'interToneGap': 100
 };
 
+window.addEventListener("message", function(event) {
+
+    // Cambia esto por el dominio real de Zammad
+    var allowedOrigin = "https://beds2b-softphone.senator.tools";
+
+    if (event.origin !== allowedOrigin) {
+        console.warn("Mensaje rechazado por origen no permitido:", event.origin);
+        return;
+    }
+
+    if (!event.data || event.data.source !== "zammad") {
+        return;
+    }
+
+    switch (event.data.action) {
+
+        case "answer-call":
+            answerIncomingCall();
+            break;
+
+        case "reject-call":
+            rejectIncomingCall();
+            break;
+
+        case "hangup-call":
+            if (cur_call) {
+                cur_call.terminate();
+            }
+            break;
+
+        default:
+            console.warn("Acción no reconocida:", event.data.action);
+            break;
+    }
+});
+
+
+//COMMS
+function answerIncomingCall() {
+    if (!incomingsession) {
+        console.warn("No hay llamada entrante para aceptar.");
+        return;
+    }
+
+    audioElement.pause();
+
+    incomingsession.accept({
+        media: {
+            constraints: {
+                audio: {
+                    deviceId: {
+                        ideal: $("#selectmic").val()
+                    }
+                },
+                video: false
+            },
+            render: {
+                remote: document.getElementById("audio")
+            }
+        }
+    });
+
+    cur_call = incomingsession;
+
+    $("#isIncomingcall").hide();
+    $("#isNotIncomingcall").show();
+
+    cur_call.on("accepted", onAccepted.bind(cur_call));
+    cur_call.once("bye", onTerminated.bind(cur_call));
+    cur_call.once("failed", onTerminated.bind(cur_call));
+    cur_call.once("cancel", onTerminated.bind(cur_call));
+    cur_call.once("terminated", onTerminated2.bind(cur_call));
+
+    console.log("Llamada aceptada desde API iframe.");
+}
+
+function rejectIncomingCall() {
+    if (!incomingsession) {
+        console.warn("No hay llamada entrante para rechazar.");
+        return;
+    }
+
+    try {
+        incomingsession.reject();
+    } catch (e) {
+        console.error("Error rechazando llamada:", e);
+    }
+
+    incomingsession = null;
+
+    $("#isIncomingcall").hide();
+    $("#isNotIncomingcall").show();
+
+    console.log("Llamada rechazada desde API iframe.");
+}
 
 //http://jsfiddle.net/55Kfu/1506/
 //https://stackoverflow.com/posts/13194087/revisions
@@ -105,8 +200,6 @@ function tempAlert(msg,duration)
      document.body.appendChild(el);
     console.error("TEMPALERT");
 }
-
-
 
 function onCancelled() {
     audioElement.pause();
@@ -364,8 +457,6 @@ function handleNotify(r) {
         }
         span.innerText = newMessages + "/" + oldMessages;
     }
-
-
 }
 
 
@@ -393,7 +484,7 @@ $("#anscallbtn").click(function() {
     cur_call = incomingsession;
     var span = document.getElementById('speakingwith');
     var txt = document.createTextNode(cur_call.remoteIdentity.displayName.toString());
-    span.innerText = txt.textContent + " (" + cur_call.remoteIdentity.uri.user.toString() + ")";
+    span.innerText = txt.textContent;
 
     cur_call.on('accepted', onAccepted.bind(cur_call));
     cur_call.once('bye', onTerminated.bind(cur_call));
@@ -559,7 +650,7 @@ $("#callbtn").click(function() {
         var regex1 = /#/g;
         var new_ext = $("#ext").val().replace(regex1, "_");
         $("#ext").val(new_ext);
-	oldext=$("#ext").val();
+	    oldext=$("#ext").val();
         docall();
     }
 });
@@ -592,6 +683,8 @@ $("#loginbtn").click(function() {
     init();
 });
 
+
+//DEPRECATED BUTTONS
 $("#xferbtn").click(function() {
    if(isOutboundCall==true){
         cur_call.dtmf("*499", dtmf_options);
@@ -608,6 +701,9 @@ $("#attxbtn").click(function() {
     }
 });
 
+
+
+//BUTTON LOGIC - OPTIONS TOOLS
 $("#mutebtn").click(function() {
     if (isOnMute) {
         cur_call.unmute();
@@ -706,92 +802,116 @@ $("#autoanswerbtn").click(function() {
     }
 });
 
-
-
+//DIAL BUTTONS LOGIC - INCOMING CALL
 $("#ext1btn").click(function() {
     $("#ext").val($("#ext").val() + "1");
     var span = document.getElementById('calling');
+    var input = document.getElementById('calling_input');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = "DIALING: " + txt.textContent;
+    input.value = $("#ext").val(); 
 });
 
 $("#ext2btn").click(function() {
     $("#ext").val($("#ext").val() + "2");
     var span = document.getElementById('calling');
+    var input = document.getElementById('calling_input');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = "DIALING: " + txt.textContent;
+    input.value = $("#ext").val(); 
 });
 
 $("#ext3btn").click(function() {
     $("#ext").val($("#ext").val() + "3");
     var span = document.getElementById('calling');
+    var input = document.getElementById('calling_input');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = "DIALING: " + txt.textContent;
+    input.value = $("#ext").val(); 
 });
 
 $("#ext4btn").click(function() {
     $("#ext").val($("#ext").val() + "4");
     var span = document.getElementById('calling');
+    var input = document.getElementById('calling_input');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = "DIALING: " + txt.textContent;
+    input.value = $("#ext").val(); 
 });
 
 $("#ext5btn").click(function() {
     $("#ext").val($("#ext").val() + "5");
     var span = document.getElementById('calling');
+    var input = document.getElementById('calling_input');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = "DIALING: " + txt.textContent;
+    input.value = $("#ext").val(); 
 });
 
 $("#ext6btn").click(function() {
     $("#ext").val($("#ext").val() + "6");
     var span = document.getElementById('calling');
+    var input = document.getElementById('calling_input');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = "DIALING: " + txt.textContent;
+    input.value = $("#ext").val(); 
 });
 
 $("#ext7btn").click(function() {
     $("#ext").val($("#ext").val() + "7");
     var span = document.getElementById('calling');
+    var input = document.getElementById('calling_input');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = "DIALING: " + txt.textContent;
+    input.value = $("#ext").val(); 
 });
 
 $("#ext8btn").click(function() {
     $("#ext").val($("#ext").val() + "8");
     var span = document.getElementById('calling');
+    var input = document.getElementById('calling_input');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = "DIALING: " + txt.textContent;
+    input.value = $("#ext").val(); 
 });
 
 $("#ext9btn").click(function() {
     $("#ext").val($("#ext").val() + "9");
     var span = document.getElementById('calling');
+    var input = document.getElementById('calling_input');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = "DIALING: " + txt.textContent;
+    input.value = $("#ext").val(); 
 });
 
 $("#ext0btn").click(function() {
     $("#ext").val($("#ext").val() + "0");
     var span = document.getElementById('calling');
+    var input = document.getElementById('calling_input');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = "DIALING: " + txt.textContent;
+    input.value = $("#ext").val(); 
 });
 
 $("#extstarbtn").click(function() {
     $("#ext").val($("#ext").val() + "*");
     var span = document.getElementById('calling');
+    var input = document.getElementById('calling_input');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = "DIALING: " + txt.textContent;
+    input.value = $("#ext").val(); 
 });
 
 $("#extpoundbtn").click(function() {
     $("#ext").val($("#ext").val() + "#");
     var span = document.getElementById('calling');
+    var input = document.getElementById('calling_input');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = "DIALING: " + txt.textContent;
+    input.value = $("#ext").val(); 
 });
 
+//DIAL BUTTONS LOGIC - IN CALL
 $("#dtmf1btn").click(function() {
     cur_call.dtmf("1", dtmf_options);
 });
@@ -840,24 +960,13 @@ $("#dtmfpoundbtn").click(function() {
     cur_call.dtmf("#", dtmf_options);
 });
 
-
-function resetOptionsTimer() {
-/*
-    window.clearTimeout(callTimer);
-
-    callTimer = window.setTimeout(function() {
-        console.error("NETWORK DISCONNECT, NO OPTIONS SINCE 25000 msec");
-        beep(1000, 2);
-        if (cur_call) {
-            alert("NETWORK DISCONNECT, CLICK OK TO PROCEED");
-        }
-        $("#hangupbtn").trigger("click");
-        if (gotopanel == false){
-            location.reload();
-        }
-    }, 25000);
-*/
-}
+//Call on enter key pressed in input field
+$("#calling_input").keyup(function(event) {
+    if (event.keyCode == 13 && !event.shiftKey) {
+        $("#ext").val($("#calling_input").val());
+        $("#callbtn").trigger("click");
+    }
+});
 
 function init() {
 
@@ -988,28 +1097,6 @@ function init() {
     });
 }
 
-$("#calling_input").keyup(function(event) {
-    if (event.keyCode == 13 && !event.shiftKey) {
-        $("#ext").val($("#calling_input").val());
-        $("#callbtn").trigger("click");
-    }
-});
-
-/*
-window.onbeforeunload = function(e) {
-    e = e || window.event;
-
-    console.log("closing window");
-
-    // For IE and Firefox prior to version 4
-    if (e) {
-        e.returnValue = "Sure?";
-    }
-
-    return "Sure?";
-};
-*/
-
 $(window).load(function() {
     cur_call = null;
     resetOptionsTimer();
@@ -1130,15 +1217,7 @@ $(document).ready(function() {
     setupCacheHandler();
 });
 
-$("#phonebookbtn").click(function() {
-    var x = document.getElementById('phonebook');
-    if (x.style.display === 'none') {
-        x.style.display = 'block';
-    } else {
-        x.style.display = 'none';
-    }
-});
-
+//CACHE HANDLER
 var cacheItems = ['login', 'passwd', 'yourname', 'domain', 'proxy', 'port',
     'pres1', 'pres1_label',
     'pres2', 'pres2_label',
@@ -1174,3 +1253,32 @@ function setupCacheHandler() {
         });
     }
 }
+
+//DEPRECATED
+function resetOptionsTimer() {
+/*
+    window.clearTimeout(callTimer);
+
+    callTimer = window.setTimeout(function() {
+        console.error("NETWORK DISCONNECT, NO OPTIONS SINCE 25000 msec");
+        beep(1000, 2);
+        if (cur_call) {
+            alert("NETWORK DISCONNECT, CLICK OK TO PROCEED");
+        }
+        $("#hangupbtn").trigger("click");
+        if (gotopanel == false){
+            location.reload();
+        }
+    }, 25000);
+*/
+}
+
+//DEPRECATED
+$("#phonebookbtn").click(function() {
+    var x = document.getElementById('phonebook');
+    if (x.style.display === 'none') {
+        x.style.display = 'block';
+    } else {
+        x.style.display = 'none';
+    }
+});
