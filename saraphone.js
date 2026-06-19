@@ -60,8 +60,10 @@ var dtmf_options = {
 
 window.addEventListener("message", function(event) {
 
-    // Cambia esto por el dominio real de Zammad
-    var allowedOrigin = "https://beds2b-softphone.senator.tools";
+    var allowedOrigin = [
+    "http://localhost:3000",
+    "https://zammad.senator.tools"
+];
 
     if (event.origin !== allowedOrigin) {
         console.warn("Mensaje rechazado por origen no permitido:", event.origin);
