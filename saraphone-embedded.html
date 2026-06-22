@@ -184,15 +184,15 @@ var audio_silence = new Audio("wav/silence.wav");
                             <div style="max-width: 95%; margin: -20px 0px 0px 0px; white-space: nowrap; overflow: hidden; text-overflow: clip;"> 
                                 <input id="ext" type="hidden" class="form-control input-lg" placeholder="number to dial (eg: 0549123456)" > 
                                 <h2><span id="calling" style="font-size: 20px !important;">...</span></h2> 
-                                <input id="calling_input" style="max-width: 280px;font-size: 15px !important;" class="form-control input-sm" placeholder="number to dial (eg: 0549123456)" >
                             </div> 
-                            
                         </div>
                         <div class="webphone-profile-notifications">
                             <img src="img/notification.png" data-inline="true" id="asknotificationpermission" title="Permitir notificaciones" aria-label="Permitir notificaciones">
-                            
                         </div>
                     </div> 
+                    <div id="dialpad" style="width: 100%; display: flex; justify-content: center;">
+                        <input id="calling_input" style="border-radius: 1rem; max-width: 320px;font-size: 15px !important; border: none; background-color: #f7f7f7;" class="form-control input-sm" placeholder="number to dial (eg: 0549123456)" >
+                    </div>
                     <div id="isIncomingcall"> 
                         <div class="row"> 
                             <div class="webphone-keypad" id="webphone_keypad"> 
