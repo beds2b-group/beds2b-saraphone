@@ -100,9 +100,8 @@ input.btn:hover, input.btn:active, input.btn:focus, input.button:hover,	input.bu
     height: 100%;
 }
 #webphone_display{
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     padding-top: 5px;
-    height: 120px;
     display: flex;
 }
 #webphone_keypad{

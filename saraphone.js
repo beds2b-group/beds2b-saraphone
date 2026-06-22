@@ -805,109 +805,73 @@ $("#autoanswerbtn").click(function() {
 //DIAL BUTTONS LOGIC - INCOMING CALL
 $("#ext1btn").click(function() {
     $("#ext").val($("#ext").val() + "1");
-    var span = document.getElementById('calling');
     var input = document.getElementById('calling_input');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
     input.value = $("#ext").val(); 
 });
 
 $("#ext2btn").click(function() {
     $("#ext").val($("#ext").val() + "2");
-    var span = document.getElementById('calling');
     var input = document.getElementById('calling_input');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
     input.value = $("#ext").val(); 
 });
 
 $("#ext3btn").click(function() {
     $("#ext").val($("#ext").val() + "3");
-    var span = document.getElementById('calling');
     var input = document.getElementById('calling_input');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
     input.value = $("#ext").val(); 
 });
 
 $("#ext4btn").click(function() {
     $("#ext").val($("#ext").val() + "4");
-    var span = document.getElementById('calling');
     var input = document.getElementById('calling_input');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
     input.value = $("#ext").val(); 
 });
 
 $("#ext5btn").click(function() {
     $("#ext").val($("#ext").val() + "5");
-    var span = document.getElementById('calling');
     var input = document.getElementById('calling_input');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
     input.value = $("#ext").val(); 
 });
 
 $("#ext6btn").click(function() {
     $("#ext").val($("#ext").val() + "6");
-    var span = document.getElementById('calling');
     var input = document.getElementById('calling_input');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
     input.value = $("#ext").val(); 
 });
 
 $("#ext7btn").click(function() {
     $("#ext").val($("#ext").val() + "7");
-    var span = document.getElementById('calling');
     var input = document.getElementById('calling_input');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
     input.value = $("#ext").val(); 
 });
 
 $("#ext8btn").click(function() {
     $("#ext").val($("#ext").val() + "8");
-    var span = document.getElementById('calling');
     var input = document.getElementById('calling_input');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
     input.value = $("#ext").val(); 
 });
 
 $("#ext9btn").click(function() {
     $("#ext").val($("#ext").val() + "9");
-    var span = document.getElementById('calling');
     var input = document.getElementById('calling_input');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
     input.value = $("#ext").val(); 
 });
 
 $("#ext0btn").click(function() {
     $("#ext").val($("#ext").val() + "0");
-    var span = document.getElementById('calling');
     var input = document.getElementById('calling_input');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
     input.value = $("#ext").val(); 
 });
 
 $("#extstarbtn").click(function() {
     $("#ext").val($("#ext").val() + "*");
-    var span = document.getElementById('calling');
     var input = document.getElementById('calling_input');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
     input.value = $("#ext").val(); 
 });
 
 $("#extpoundbtn").click(function() {
     $("#ext").val($("#ext").val() + "#");
-    var span = document.getElementById('calling');
     var input = document.getElementById('calling_input');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
     input.value = $("#ext").val(); 
 });
 
