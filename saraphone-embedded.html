@@ -43,7 +43,7 @@
     <link href="css/style2.css" rel="stylesheet"> 
 </head> 
 
-<body style="background-color: white;"> 
+<body style="background-color: white; overflow: hidden;"> 
 <script> 
 var audio0 = new Audio("wav/0.wav"); 
 var audio1 = new Audio("wav/1.wav"); 
@@ -183,7 +183,7 @@ var audio_silence = new Audio("wav/silence.wav");
                             
                             <div style="max-width: 95%; margin: -20px 0px 0px 0px; white-space: nowrap; overflow: hidden; text-overflow: clip;"> 
                                 <input id="ext" type="hidden" class="form-control input-lg" placeholder="number to dial (eg: 0549123456)" > 
-                                <h2><span id="calling" style="font-size: 20px !important;">...</span></h2> 
+                                <h2 style="margin:0;"><span id="calling" style="font-size: 20px !important;">...</span></h2> 
                             </div> 
                         </div>
                         <div class="webphone-profile-notifications">
