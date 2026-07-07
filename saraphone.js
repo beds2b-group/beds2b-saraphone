@@ -58,6 +58,24 @@ var dtmf_options = {
   'interToneGap': 100
 };
 
+window.addEventListener("keydown", function (event) {
+  if (event.key === "Backspace") {
+    console.log("Backspace pulsado");
+    try {
+        var extEl = document.getElementById('ext');
+        var callingInput = document.getElementById('calling_input');
+        if (!extEl) return;
+        var cur = extEl.value || "";
+        if (cur.length > 0) {
+            extEl.value = cur.slice(0, -1);
+            if (callingInput) callingInput.value = extEl.value;
+        }
+    } catch (e) {
+        console.error('keydown handler error', e);
+    }
+  }
+});
+
 window.addEventListener("message", function(event) {
 
     // Cambia esto por el dominio real de Zammad
