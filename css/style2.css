@@ -94,8 +94,7 @@ input.btn:hover, input.btn:active, input.btn:focus, input.button:hover,	input.bu
     border-width: 1px;
     border-radius: 15px;
     background: #ffffff;
-    padding: 15px;
-    margin-bottom: 10px;
+    padding: 15px 15px 0 15px;
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
 }
 #webphone_display{
@@ -117,7 +116,7 @@ input.btn:hover, input.btn:active, input.btn:focus, input.button:hover,	input.bu
     border-radius: 22px;
 }
 #webphone_keypad_right{
-    padding: 20px 0px 5px 0px;
+    padding: 0px 0px 5px 0px;
     margin: 0px 5px 5px 5px;
 }
 #webphone_blf{
