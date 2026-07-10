@@ -79,14 +79,17 @@ window.addEventListener("keydown", function (event) {
 window.addEventListener("message", function(event) {
 
     // Cambia esto por el dominio real de Zammad
-    var allowedOrigin = [
+    var allowedOrigins = [
+        "https://zammad.senator.tools",
         "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://zammad.senator.tools"
+        "http://127.0.0.1:3000"
     ];
 
-    if (event.origin !== allowedOrigin) {
-        console.warn("Mensaje rechazado por origen no permitido:", event.origin);
+    console.log("Origen recibido:", event.origin);
+    console.log("Permitido:", allowedOrigins.includes(event.origin));
+
+    if (!allowedOrigins.includes(event.origin)) {
+        console.warn("Mensaje rechazado por origen no permitido!:", event.origin);
         return;
     }
 
