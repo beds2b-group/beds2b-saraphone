@@ -89,13 +89,8 @@ input.btn:hover, input.btn:active, input.btn:focus, input.button:hover,	input.bu
 
 /* webphone */
 #webphone_body{
-    text-shadow:0 0px 0px rgba(0,0,0,.5);
-    border-style: solid;
-    border-width: 1px;
-    border-radius: 15px;
     background: #ffffff;
     padding: 15px 15px 0 15px;
-    box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
 }
 #webphone_display{
     margin-bottom: 10px;
