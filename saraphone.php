@@ -77,8 +77,10 @@ echo "    <link href=\"css/bootstrap.min.css\" rel=\"stylesheet\"> \n";
 echo "    <link href=\"css/style2.css\" rel=\"stylesheet\"> \n";
 echo "</head> \n";
 echo "\n";
-echo "<body> \n";
 
+
+$is_embed = isset($_GET['embed']) && $_GET['embed'] == '1';
+echo "<body> \n";
 $wanted_device = $_GET['wanted_device'] ;
 
 if( strlen($rows3[0]['device_address']) ){

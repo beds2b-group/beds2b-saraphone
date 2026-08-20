@@ -29,6 +29,10 @@
 
 'use strict';
 
+var cur_prov = 'SIP.js';
+// var cur_prov = 'twilio';
+// var cur_prov = "infobip";
+
 var cur_call = null;
 var ua;
 var which_server;
@@ -41,6 +45,7 @@ var isRecording = false;
 var isDnd = false;
 var isNoRing = false;
 var isAutoAnswer = false;
+var autoAnswerOnce = false;
 var isRegistered = false;
 var vmail_subscription = false;
 var presence_array = new Array();
@@ -56,6 +61,143 @@ var dtmf_options = {
   'duration': 100,
   'interToneGap': 100
 };
+
+window.addEventListener("keydown", function (event) {
+  if (event.key === "Backspace") {
+    console.log("Backspace pulsado");
+    try {
+        var extEl = document.getElementById('ext');
+        var callingInput = document.getElementById('calling_input');
+        if (!extEl) return;
+        var cur = extEl.value || "";
+        if (cur.length > 0) {
+            extEl.value = cur.slice(0, -1);
+            if (callingInput) callingInput.value = extEl.value;
+        }
+    } catch (e) {
+        console.error('keydown handler error', e);
+    }
+  }
+});
+
+window.addEventListener("message", function(event) {
+
+    // Cambia esto por el dominio real de Zammad
+    var allowedOrigins = [
+        "https://zammad.senator.tools",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
+    ];
+
+    console.log("Origen recibido:", event.origin);
+    console.log("Permitido:", allowedOrigins.includes(event.origin));
+
+    if (!allowedOrigins.includes(event.origin)) {
+        console.warn("Mensaje rechazado por origen no permitido!:", event.origin);
+        return;
+    }
+
+    if (!event.data || event.data.source !== "zammad") {
+        return;
+    }
+
+    switch (event.data.action) {
+
+        case "answer-call":
+            answerIncomingCall();
+            break;
+
+        case "reject-call":
+            rejectIncomingCall();
+            break;
+
+        case "hangup-call":
+            if (cur_call) {
+                cur_call.terminate();
+            }
+            break;
+
+        default:
+            console.warn("Acción no reconocida:", event.data.action);
+            break;
+    }
+});
+
+
+//COMMS
+function answerIncomingCall() {
+    if (!incomingsession) {
+        console.warn("No hay llamada entrante para aceptar.");
+        return;
+    }
+
+    audioElement.pause();
+
+    incomingsession.accept({
+        media: {
+            constraints: {
+                audio: {
+                    deviceId: {
+                        ideal: $("#selectmic").val()
+                    }
+                },
+                video: false
+            },
+            render: {
+                remote: document.getElementById("audio")
+            }
+        }
+    });
+
+    cur_call = incomingsession;
+
+    $("#isIncomingcall").hide();
+    $("#isNotIncomingcall").show();
+
+    cur_call.on("accepted", onAccepted.bind(cur_call));
+    cur_call.once("bye", onTerminated.bind(cur_call));
+    cur_call.once("failed", onTerminated.bind(cur_call));
+    cur_call.once("cancel", onTerminated.bind(cur_call));
+    cur_call.once("terminated", onTerminated2.bind(cur_call));
+
+    console.log("Llamada aceptada desde API iframe.");
+}
+
+function rejectIncomingCall() {
+    if (!incomingsession) {
+        console.warn("No hay llamada entrante para rechazar.");
+        return;
+    }
+
+    try {
+        incomingsession.reject();
+    } catch (e) {
+        console.error("Error rechazando llamada:", e);
+    }
+
+    incomingsession = null;
+
+    $("#isIncomingcall").hide();
+    $("#isNotIncomingcall").show();
+
+    console.log("Llamada rechazada desde API iframe.");
+}
+
+function sendHeight() {
+  const height = document.body.scrollHeight;
+
+  window.parent.postMessage(
+    {
+      type: "resize",
+      height: height
+    },
+    "*"
+  );
+}
+
+window.addEventListener("load", sendHeight);
+
+new ResizeObserver(sendHeight).observe(document.body);
 
 //http://jsfiddle.net/55Kfu/1506/
 //https://stackoverflow.com/posts/13194087/revisions
@@ -103,8 +245,6 @@ function tempAlert(msg,duration)
      document.body.appendChild(el);
     console.error("TEMPALERT");
 }
-
-
 
 function onCancelled() {
     audioElement.pause();
@@ -362,8 +502,6 @@ function handleNotify(r) {
         }
         span.innerText = newMessages + "/" + oldMessages;
     }
-
-
 }
 
 
@@ -391,7 +529,7 @@ $("#anscallbtn").click(function() {
     cur_call = incomingsession;
     var span = document.getElementById('speakingwith');
     var txt = document.createTextNode(cur_call.remoteIdentity.displayName.toString());
-    span.innerText = txt.textContent + " (" + cur_call.remoteIdentity.uri.user.toString() + ")";
+    span.innerText = txt.textContent;
 
     cur_call.on('accepted', onAccepted.bind(cur_call));
     cur_call.once('bye', onTerminated.bind(cur_call));
@@ -455,8 +593,9 @@ function handleInvite(s) {
                 audioElement.currentTime = 0;
                 audioElement.play();
             }
-            if (isAutoAnswer == true) {
+            if (isAutoAnswer == true || autoAnswerOnce == true) {
                 $("#anscallbtn").trigger("click");
+                autoAnswerOnce = false;
             }
         }
     }
@@ -556,7 +695,7 @@ $("#callbtn").click(function() {
         var regex1 = /#/g;
         var new_ext = $("#ext").val().replace(regex1, "_");
         $("#ext").val(new_ext);
-	oldext=$("#ext").val();
+	    oldext=$("#ext").val();
         docall();
     }
 });
@@ -589,6 +728,8 @@ $("#loginbtn").click(function() {
     init();
 });
 
+
+//DEPRECATED BUTTONS
 $("#xferbtn").click(function() {
    if(isOutboundCall==true){
         cur_call.dtmf("*499", dtmf_options);
@@ -605,6 +746,9 @@ $("#attxbtn").click(function() {
     }
 });
 
+
+
+//BUTTON LOGIC - OPTIONS TOOLS
 $("#mutebtn").click(function() {
     if (isOnMute) {
         cur_call.unmute();
@@ -703,92 +847,80 @@ $("#autoanswerbtn").click(function() {
     }
 });
 
-
-
+//DIAL BUTTONS LOGIC - INCOMING CALL
 $("#ext1btn").click(function() {
     $("#ext").val($("#ext").val() + "1");
-    var span = document.getElementById('calling');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val(); 
 });
 
 $("#ext2btn").click(function() {
     $("#ext").val($("#ext").val() + "2");
-    var span = document.getElementById('calling');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val(); 
 });
 
 $("#ext3btn").click(function() {
     $("#ext").val($("#ext").val() + "3");
-    var span = document.getElementById('calling');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val(); 
 });
 
 $("#ext4btn").click(function() {
     $("#ext").val($("#ext").val() + "4");
-    var span = document.getElementById('calling');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val(); 
 });
 
 $("#ext5btn").click(function() {
     $("#ext").val($("#ext").val() + "5");
-    var span = document.getElementById('calling');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val(); 
 });
 
 $("#ext6btn").click(function() {
     $("#ext").val($("#ext").val() + "6");
-    var span = document.getElementById('calling');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val(); 
 });
 
 $("#ext7btn").click(function() {
     $("#ext").val($("#ext").val() + "7");
-    var span = document.getElementById('calling');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val(); 
 });
 
 $("#ext8btn").click(function() {
     $("#ext").val($("#ext").val() + "8");
-    var span = document.getElementById('calling');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val(); 
 });
 
 $("#ext9btn").click(function() {
     $("#ext").val($("#ext").val() + "9");
-    var span = document.getElementById('calling');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val(); 
 });
 
 $("#ext0btn").click(function() {
     $("#ext").val($("#ext").val() + "0");
-    var span = document.getElementById('calling');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val(); 
 });
 
 $("#extstarbtn").click(function() {
     $("#ext").val($("#ext").val() + "*");
-    var span = document.getElementById('calling');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val(); 
 });
 
 $("#extpoundbtn").click(function() {
     $("#ext").val($("#ext").val() + "#");
-    var span = document.getElementById('calling');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = "DIALING: " + txt.textContent;
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val(); 
 });
 
+//DIAL BUTTONS LOGIC - IN CALL
 $("#dtmf1btn").click(function() {
     cur_call.dtmf("1", dtmf_options);
 });
@@ -837,24 +969,13 @@ $("#dtmfpoundbtn").click(function() {
     cur_call.dtmf("#", dtmf_options);
 });
 
-
-function resetOptionsTimer() {
-/*
-    window.clearTimeout(callTimer);
-
-    callTimer = window.setTimeout(function() {
-        console.error("NETWORK DISCONNECT, NO OPTIONS SINCE 25000 msec");
-        beep(1000, 2);
-        if (cur_call) {
-            alert("NETWORK DISCONNECT, CLICK OK TO PROCEED");
-        }
-        $("#hangupbtn").trigger("click");
-        if (gotopanel == false){
-            location.reload();
-        }
-    }, 25000);
-*/
-}
+//Call on enter key pressed in input field
+$("#calling_input").keyup(function(event) {
+    if (event.keyCode == 13 && !event.shiftKey) {
+        $("#ext").val($("#calling_input").val());
+        $("#callbtn").trigger("click");
+    }
+});
 
 function init() {
 
@@ -985,28 +1106,6 @@ function init() {
     });
 }
 
-$("#calling_input").keyup(function(event) {
-    if (event.keyCode == 13 && !event.shiftKey) {
-        $("#ext").val($("#calling_input").val());
-        $("#callbtn").trigger("click");
-    }
-});
-
-/*
-window.onbeforeunload = function(e) {
-    e = e || window.event;
-
-    console.log("closing window");
-
-    // For IE and Firefox prior to version 4
-    if (e) {
-        e.returnValue = "Sure?";
-    }
-
-    return "Sure?";
-};
-*/
-
 $(window).load(function() {
     cur_call = null;
     resetOptionsTimer();
@@ -1020,7 +1119,21 @@ $(window).load(function() {
     var url_string = window.location.href; //window.location.href
     var url = new URL(url_string);
 
-    clicklogin = url.searchParams.get("clicklogin");
+    var loginParam = url.searchParams.get("login");
+    var passwdParam = url.searchParams.get("passwd");
+    var isAutoAnswerParam = url.searchParams.get("autoanswer");
+
+    if (loginParam)
+        $("#login").val(loginParam);
+    
+    if (passwdParam)
+        $("#passwd").val(passwdParam);
+
+    if (isAutoAnswerParam)
+        autoAnswerOnce = true;
+
+    if (loginParam && passwdParam)
+        clicklogin = "yes";
 
     $("#signin").hide();
     $("#dial").hide();
@@ -1113,15 +1226,7 @@ $(document).ready(function() {
     setupCacheHandler();
 });
 
-$("#phonebookbtn").click(function() {
-    var x = document.getElementById('phonebook');
-    if (x.style.display === 'none') {
-        x.style.display = 'block';
-    } else {
-        x.style.display = 'none';
-    }
-});
-
+//CACHE HANDLER
 var cacheItems = ['login', 'passwd', 'yourname', 'domain', 'proxy', 'port',
     'pres1', 'pres1_label',
     'pres2', 'pres2_label',
@@ -1133,14 +1238,56 @@ var cacheItems = ['login', 'passwd', 'yourname', 'domain', 'proxy', 'port',
     'pres8', 'pres8_label',
     'pres9', 'pres9_label',
     'pres10', 'pres10_label',
-
 ];
 
 function setupCacheHandler() {
-    for(var i = 0; i < cacheItems.length; i++) {
+    for (var i = 0; i < cacheItems.length; i++) {
         var key = cacheItems[i];
-        var value = localStorage.getItem("saraphone." + key);
-        if (value) document.getElementById(key).value = value;
-        $("#" + key).change(function(e) {localStorage.setItem("saraphone." + e.target.id, e.target.value);});
+
+        // 1. Si hay valor en localStorage, tiene prioridad (el usuario lo cambió manualmente)
+        var cachedValue = localStorage.getItem("saraphone." + key);
+        if (cachedValue) {
+            document.getElementById(key).value = cachedValue;
+
+        // 2. Si no hay valor en localStorage pero existe config.js, cargarlo desde ahí
+        } else if (typeof SARAPHONE_CONFIG !== 'undefined' && SARAPHONE_CONFIG[key] !== undefined) {
+            document.getElementById(key).value = SARAPHONE_CONFIG[key];
+            // También lo guardamos en localStorage para futuras visitas
+            localStorage.setItem("saraphone." + key, SARAPHONE_CONFIG[key]);
+        }
+
+        // 3. Seguimos guardando los cambios del usuario en localStorage como antes
+        $("#" + key).change(function(e) {
+            localStorage.setItem("saraphone." + e.target.id, e.target.value);
+        });
     }
 }
+
+//DEPRECATED
+function resetOptionsTimer() {
+/*
+    window.clearTimeout(callTimer);
+
+    callTimer = window.setTimeout(function() {
+        console.error("NETWORK DISCONNECT, NO OPTIONS SINCE 25000 msec");
+        beep(1000, 2);
+        if (cur_call) {
+            alert("NETWORK DISCONNECT, CLICK OK TO PROCEED");
+        }
+        $("#hangupbtn").trigger("click");
+        if (gotopanel == false){
+            location.reload();
+        }
+    }, 25000);
+*/
+}
+
+//DEPRECATED
+$("#phonebookbtn").click(function() {
+    var x = document.getElementById('phonebook');
+    if (x.style.display === 'none') {
+        x.style.display = 'block';
+    } else {
+        x.style.display = 'none';
+    }
+});

@@ -1,0 +1,10 @@
+services:
+  saraphone:
+    build: .
+    container_name: saraphone
+    ports:
+      - "8080:80"
+    environment:
+      INFOBIP_API_HOST: ${INFOBIP_API_HOST:-k9v5ge.api.infobip.com}
+      INFOBIP_API_KEY: ${INFOBIP_API_KEY:?Set INFOBIP_API_KEY in .env}
+    restart: unless-stopped
