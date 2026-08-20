@@ -29,9 +29,9 @@
 
 'use strict';
 
-var cur_prov = 'SIP.js';
+// var cur_prov = 'SIP.js';
 // var cur_prov = 'twilio';
-// var cur_prov = "infobip";
+var cur_prov = "infobip";
 
 var cur_call = null;
 var ua;
@@ -689,6 +689,12 @@ $("#signinctrlbtn").click(function() {
 });
 
 
+if (cur_prov !== 'SIP.js') {
+    document.getElementById('signinctrlbtn').style.display = 'none';
+    document.getElementById('passwd').style.display = 'none';
+}
+
+
 
 $("#callbtn").click(function() {
     if ($("#ext").val()) {
@@ -978,13 +984,14 @@ $("#calling_input").keyup(function(event) {
 });
 
 function init() {
+    
+    var login;
+    var yourname;
 
     var nameDomain;
     var nameProxy;
     var uri;
     var password;
-    var login;
-    var yourname;
     var wssport;
 
     cur_call = null;
