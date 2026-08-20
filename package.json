@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "infobip-rtc": "^2.7.37"
+  }
+}

@@ -29,6 +29,10 @@
 
 'use strict';
 
+var cur_prov = 'SIP.js';
+// var cur_prov = 'twilio';
+// var cur_prov = "infobip";
+
 var cur_call = null;
 var ua;
 var which_server;
