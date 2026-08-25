@@ -29,11 +29,14 @@
 
 'use strict';
 
-// var cur_prov = 'SIP.js';
+var cur_prov = 'SIP.js';
 // var cur_prov = 'twilio';
-var cur_prov = "infobip";
+// var cur_prov = "infobip";
 
+// MULTI-PROVIDER TODO:
 var cur_call = null;
+var prov = null;
+// MULTI-PROVIDER TODO:
 var ua;
 var which_server;
 var isAndroid = false;
@@ -49,6 +52,7 @@ var autoAnswerOnce = false;
 var isRegistered = false;
 var vmail_subscription = false;
 var presence_array = new Array();
+// MULTI-PROVIDER TODO:
 var incomingsession = null;
 var audioElement = document.createElement('audio');
 var callTimer;
@@ -113,7 +117,7 @@ window.addEventListener("message", function(event) {
 
         case "hangup-call":
             if (cur_call) {
-                cur_call.terminate();
+                cur_call.hangup();
             }
             break;
 
@@ -126,59 +130,23 @@ window.addEventListener("message", function(event) {
 
 //COMMS
 function answerIncomingCall() {
-    if (!incomingsession) {
-        console.warn("No hay llamada entrante para aceptar.");
-        return;
-    }
-
     audioElement.pause();
+    hideIncomingCall();
 
-    incomingsession.accept({
-        media: {
-            constraints: {
-                audio: {
-                    deviceId: {
-                        ideal: $("#selectmic").val()
-                    }
-                },
-                video: false
-            },
-            render: {
-                remote: document.getElementById("audio")
-            }
-        }
-    });
-
-    cur_call = incomingsession;
-
-    $("#isIncomingcall").hide();
-    $("#isNotIncomingcall").show();
-
-    cur_call.on("accepted", onAccepted.bind(cur_call));
-    cur_call.once("bye", onTerminated.bind(cur_call));
-    cur_call.once("failed", onTerminated.bind(cur_call));
-    cur_call.once("cancel", onTerminated.bind(cur_call));
-    cur_call.once("terminated", onTerminated2.bind(cur_call));
+    cur_call = prov.answer(incomingsession);
+    cur_call.onEstablished(onAccepted.bind(cur_call));
+    cur_call.onHangup(onTerminated.bind(cur_call));
+    cur_call.onError(onTerminated.bind(cur_call));
 
     console.log("Llamada aceptada desde API iframe.");
 }
 
+ 
 function rejectIncomingCall() {
-    if (!incomingsession) {
-        console.warn("No hay llamada entrante para rechazar.");
-        return;
-    }
+    
+    prov.reject();
 
-    try {
-        incomingsession.reject();
-    } catch (e) {
-        console.error("Error rechazando llamada:", e);
-    }
-
-    incomingsession = null;
-
-    $("#isIncomingcall").hide();
-    $("#isNotIncomingcall").show();
+    hideIncomingCall();
 
     console.log("Llamada rechazada desde API iframe.");
 }
@@ -249,8 +217,7 @@ function tempAlert(msg,duration)
 function onCancelled() {
     audioElement.pause();
     console.log('cancelled');
-    $("#isIncomingcall").hide();
-    $("#isNotIncomingcall").show();
+    hideIncomingCall();
     incomingsession = null;
     var span = document.getElementById('calling');
     $("#calling_input").val("");
@@ -265,9 +232,7 @@ function onTerminated() {
     $("#incall").hide();
     $("#ext").val("");
     if (cur_call) {
-        cur_call.terminate();
-        cur_call = null;
-        resetOptionsTimer();
+        terminateCurrCall();
     }
     isOnMute = false;
 
@@ -360,15 +325,9 @@ function notifyMe(msg) {
         }
     }
 }
-
-
-function onRegistered() {
-    if (isIOS) {
-        //do nothing
-    } else {
-        if (Notification.permission === "granted") {
-            $("#asknotificationpermission").hide();
-        }
+function onRegisteredCommon(){
+    if (!isIOS && Notification.permission === "granted") {
+        $("#asknotificationpermission").hide();
     }
 
     $("#signin").hide();
@@ -379,78 +338,85 @@ function onRegistered() {
     $("#calling_input").val("");
     span.innerText = "...";
 
+        
     var span = document.getElementById('whoami');
     var txt = document.createTextNode($("#login").val());
     span.innerText = txt.textContent + " (" + $("#yourname").val() + ")";
 
     isRegistered = true;
+}
 
 
-    var countpres = 1;
+function onRegistered() {
 
-    while (countpres < 61) {
-        if ($("#pres" + countpres).val()) {
-            presence_array[countpres] = ua.subscribe($("#pres" + countpres).val(), 'presence', {
-                expires: 120
-            });
+    //SIP Exclusive
+    if (cur_prov === 'SIP.js') {
+        var countpres = 1;
 
-            const mycountpres = countpres;
-            presence_array[countpres].on('notify', function(notification) {
-                //console.log(notification.request.body);
+        while (countpres < 61) {
+            if ($("#pres" + countpres).val()) {
+                presence_array[countpres] = ua.subscribe($("#pres" + countpres).val(), 'presence', {
+                    expires: 120
+                });
 
-                var presence = notification.request.body.match(/<dm:note>(.*)<\/dm:note>/i);
-                if (presence) {
-                    var ispresent = presence[1];
+                const mycountpres = countpres;
+                presence_array[countpres].on('notify', function(notification) {
+                    //console.log(notification.request.body);
 
-                    if (ispresent.match(/unregistered/i)) {
-                        $("#pres" + mycountpres + "btn").removeClass('btn-success btn-warning btn-default btn-danger').addClass('btn-danger');
-                    } else {
-                        if (ispresent.match(/available/i) || ispresent.match(/closed/i)) {
-                            $("#pres" + mycountpres + "btn").removeClass('btn-success btn-warning btn-default btn-danger').addClass('btn-success');
+                    var presence = notification.request.body.match(/<dm:note>(.*)<\/dm:note>/i);
+                    if (presence) {
+                        var ispresent = presence[1];
 
+                        if (ispresent.match(/unregistered/i)) {
+                            $("#pres" + mycountpres + "btn").removeClass('btn-success btn-warning btn-default btn-danger').addClass('btn-danger');
                         } else {
-                            $("#pres" + mycountpres + "btn").removeClass('btn-success btn-warning btn-default btn-danger').addClass('btn-warning');
+                            if (ispresent.match(/available/i) || ispresent.match(/closed/i)) {
+                                $("#pres" + mycountpres + "btn").removeClass('btn-success btn-warning btn-default btn-danger').addClass('btn-success');
+
+                            } else {
+                                $("#pres" + mycountpres + "btn").removeClass('btn-success btn-warning btn-default btn-danger').addClass('btn-warning');
+                            }
+                        }
+
+                        var span = document.getElementById('ispresent' + mycountpres);
+                        $("#pres" + mycountpres + "_label").val($("#pres" + mycountpres + "_label").val().substr(0, 10));
+                        if (ispresent.match(/available/i) || ispresent.match(/closed/i)) {
+                            span.innerText = $("#pres" + mycountpres + "_label").val();
+                        } else {
+                            span.innerText = $("#pres" + mycountpres + "_label").val() + ": " + ispresent;
                         }
                     }
 
-                    var span = document.getElementById('ispresent' + mycountpres);
-                    $("#pres" + mycountpres + "_label").val($("#pres" + mycountpres + "_label").val().substr(0, 10));
-                    if (ispresent.match(/available/i) || ispresent.match(/closed/i)) {
-                        span.innerText = $("#pres" + mycountpres + "_label").val();
-                    } else {
-                        span.innerText = $("#pres" + mycountpres + "_label").val() + ": " + ispresent;
-                    }
-                }
-
-            });
+                });
 
 
 
-            $("#pres" + mycountpres + "btn").click(function() {
-                $("#ext").val($("#pres" + mycountpres).val());
-		oldext=$("#ext").val();
-                docall();
-            });
+                $("#pres" + mycountpres + "btn").click(function() {
+                    $("#ext").val($("#pres" + mycountpres).val());
+		            oldext=$("#ext").val();
+                    docall();
+                });
 
 
 
-        } else {
+            } else {
 
-            $("#pres" + countpres + "btn").remove();
+                $("#pres" + countpres + "btn").remove();
 
+            }
+            countpres++;
         }
-        countpres++;
+
+        $("#webphone_blf").show();  
     }
-
-    $("#webphone_blf").show();
-
-
-    // Once subscribed, receive notifications and handle
-    vmail_subscription = ua.subscribe($("#login").val() + '@' + $("#domain").val(), 'message-summary', {
-        extraHeaders: ['Accept: application/simple-message-summary'],
-        expires: 120
-    });
-    vmail_subscription.on('notify', handleNotify);
+    //SIP Exclusive
+    if (cur_prov === 'SIP.js') {
+        vmail_subscription = ua.subscribe($("#login").val() + '@' + $("#domain").val(), 'message-summary', {
+            extraHeaders: ['Accept: application/simple-message-summary'],
+            expires: 120
+        });
+        vmail_subscription.on('notify', prov.handleNotify);
+    }
 
     if (isAndroid || isIOS) {
         $("#calling_input").hide();
@@ -465,236 +431,90 @@ $("#checkvmailbtn").click(function() {
 });
 
 $("#gotopanel1").click(function() {
-    gotopanel = true;
-    console.error("GOTOPANEL1");
-    window.location.assign('/');
+    gotToPanel("GOTOPANEL1");
 });
 
 $("#gotopanel2").click(function() {
-    gotopanel = true;
-    console.error("GOTOPANEL2");
-    window.location.assign('/');
+    gotToPanel("GOTOPANEL2");
 });
 
 $("#gotopanel3").click(function() {
-    gotopanel = true;
-    console.error("GOTOPANEL3");
-    window.location.assign('/');
+    gotToPanel("GOTOPANEL3");
 });
 
-function handleNotify(r) {
-    //console.log(r.request.method);
-    //console.log(r.request.body);
-
-    var newMessages = 0;
-    var oldMessages = 0;
-    var span = document.getElementById('vmailcount');
-    var gotmsg = r.request.body.match(/voice-message:\s*(\d+)\/(\d+)/i);
-    if (gotmsg) {
-        newMessages = parseInt(gotmsg[1]);
-        oldMessages = parseInt(gotmsg[2]);
-        if (newMessages) {
-            $("#checkvmailbtn").removeClass('btn-info').addClass('btn-warning');
-
-        } else {
-            $("#checkvmailbtn").removeClass('btn-warning').addClass('btn-info');
-
-        }
-        span.innerText = newMessages + "/" + oldMessages;
-    }
+function gotToPanel(panelId) {
+    gotopanel = true;
+    console.error(panelId);
+    window.location.assign('/');
 }
 
-
 $("#anscallbtn").click(function() {
-    audioElement.pause();
-    incomingsession.accept({
-        media: {
-            constraints: {
-                audio: {
-                    deviceId: {
-                        ideal: $("#selectmic").val()
-                    }
-                },
-                video: false
-            },
-            render: {
-                remote: document.getElementById('audio')
-            }
-        }
-    });
-    console.log('answered');
-
-    $("#isIncomingcall").hide();
-    $("#isNotIncomingcall").show();
-    cur_call = incomingsession;
-    var span = document.getElementById('speakingwith');
-    var txt = document.createTextNode(cur_call.remoteIdentity.displayName.toString());
-    span.innerText = txt.textContent;
-
-    cur_call.on('accepted', onAccepted.bind(cur_call));
-    cur_call.once('bye', onTerminated.bind(cur_call));
-    cur_call.once('failed', onTerminated.bind(cur_call));
-    cur_call.once('cancel', onTerminated.bind(cur_call));
-    cur_call.once('terminated', onTerminated2.bind(cur_call));
+    answerIncomingCall();
 });
 
-
+// MULTI-PROVIDER DONE
 $("#rejcallbtn").click(function() {
     audioElement.pause();
-    incomingsession.reject({
-        statusCode: '486',
-        reasonPhrase: 'Busy Here 1'
-    });
+    prov.reject();
     console.log('rejected');
-    $("#isIncomingcall").hide();
-    $("#isNotIncomingcall").show();
+    hideIncomingCall();
     var span = document.getElementById('calling');
     $("#calling_input").val("");
     span.innerText = "...";
-    incomingsession = null;
 });
 
 
-
-function handleInvite(s) {
-    if (cur_call) {
-        s.reject({
-            statusCode: '486',
-            reasonPhrase: 'Busy Here 2'
-        });
-    }
-    if (isDnd) {
-        s.reject({
-            statusCode: '486',
-            reasonPhrase: 'Busy Here 3'
-        });
-    } else {
-        if (!cur_call) {
-            var span = document.getElementById('calling');
-            var txt = "---";
-            isIncomingCall = true;
-            isOutboundCall = false;
-	    if(s.remoteIdentity.displayName && s.remoteIdentity.displayName.toString()) {
-            	txt = document.createTextNode(s.remoteIdentity.displayName.toString());
-	    }
-            span.innerText = "CALL FROM: " + txt.textContent + " (" + s.remoteIdentity.uri.user.toString() + ")";
-            incomingsession = s;
-            $("#isIncomingcall").show();
-            $("#isNotIncomingcall").hide();
-            incomingsession.once('cancel', onCancelled.bind(incomingsession));
-
-            if (isIOS) {
-                //do nothing
-            } else {
-                notifyMe("CALL FROM: " + txt.textContent + " (" + s.remoteIdentity.uri.user.toString() + ")");
-            }
-
-            if (isNoRing == false) {
-                audioElement.currentTime = 0;
-                audioElement.play();
-            }
-            if (isAutoAnswer == true || autoAnswerOnce == true) {
-                $("#anscallbtn").trigger("click");
-                autoAnswerOnce = false;
-            }
-        }
-    }
-}
-
-
+// MULTI-PROVIDER DONE:
 function docall() {
-
     if (cur_call) {
-        cur_call.terminate();
-        cur_call = null;
-        resetOptionsTimer();
+        terminateCurrCall();
     }
 
     isIncomingCall = false;
     isOutboundCall = true;
 
-    cur_call = ua.invite($("#ext").val(), {
-        media: {
-            constraints: {
-                audio: {
-                    deviceId: {
-                        ideal: $("#selectmic").val()
-                    }
-                },
-                video: false
-            },
-            render: {
-                remote: document.getElementById('audio')
-            }
-        }
+    cur_call = prov.dial($("#ext").val(), {
+        deviceId: $("#selectmic").val(),
+        remoteAudioElement: document.getElementById('audio')
     });
 
-    cur_call.on('accepted', onAccepted.bind(cur_call));
-    cur_call.once('failed', function(response, cause) {
-        if (cause != "null") {
-            console.log(cause);
-        } else {
-            cause = "N/A";
-        }
+    cur_call.onEstablished(onAccepted.bind(cur_call));
+
+    cur_call.onError(function(reason) {
         var span = document.getElementById('calling');
         onTerminated(cur_call);
-        var txt = document.createTextNode(response.status_code + ": " + cause);
-        span.innerText = txt.textContent;
-    })
+        span.innerText = reason;
+    });
 
-    cur_call.once('bye', function(request) {
-        if (request.headers.Reason && !(request.headers.Reason["0"].raw.toString().match(/cause=16/)) && !(request.headers.Reason["0"].raw.toString().match(/cause=31/))) {
-            console.log(request);
-            var span = document.getElementById('calling');
-            onTerminated(cur_call);
-            var regex = /.*text="(.*)".*/;
-            var txt = document.createTextNode(request.headers.Reason["0"].raw.toString().replace(regex, "$1"));
-            span.innerText = txt.textContent;
-        } else {
-            onTerminated(cur_call);
-        }
-    })
-    cur_call.once('cancel', onTerminated.bind(cur_call));
+    cur_call.onHangup(function(reason) {
+        var span = document.getElementById('calling');
+        onTerminated(cur_call);
+        span.innerText = reason || "...";
+    });
 
     var span = document.getElementById('speakingwith');
     var txt = document.createTextNode($("#ext").val());
     span.innerText = txt.textContent;
 }
 
+function toggleDisplay(elementId) {
+    var el = document.getElementById(elementId);
+    el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+}
 
 $("#dialctrlbtn").click(function() {
-    var x = document.getElementById('dialadv1');
-    if (x.style.display === 'none') {
-        x.style.display = 'block';
-    } else {
-        x.style.display = 'none';
-    }
-    x = document.getElementById('dialadv2');
-    if (x.style.display === 'none') {
-        x.style.display = 'block';
-    } else {
-        x.style.display = 'none';
-    }
-
-
+    toggleDisplay('dialadv1');
+    toggleDisplay('dialadv2');
 });
 
 $("#signinctrlbtn").click(function() {
-    var x = document.getElementById('signinadv1');
-    if (x.style.display === 'none') {
-        x.style.display = 'block';
-    } else {
-        x.style.display = 'none';
-    }
+    toggleDisplay('signinadv1');
 });
-
 
 if (cur_prov !== 'SIP.js') {
     document.getElementById('signinctrlbtn').style.display = 'none';
     document.getElementById('passwd').style.display = 'none';
 }
-
-
 
 $("#callbtn").click(function() {
     if ($("#ext").val()) {
@@ -718,9 +538,7 @@ $("#delcallbtn").click(function() {
 
 $("#hangupbtn").click(function() {
     if (cur_call) {
-        cur_call.terminate();
-        cur_call = null;
-        resetOptionsTimer();
+        terminateCurrCall();
     }
     $("#br").show();
     $("#ext").show();
@@ -729,32 +547,19 @@ $("#hangupbtn").click(function() {
     span.innerText = "...";
 });
 
-
 $("#loginbtn").click(function() {
     init();
 });
 
 
-//DEPRECATED BUTTONS
-$("#xferbtn").click(function() {
-   if(isOutboundCall==true){
-        cur_call.dtmf("*499", dtmf_options);
-    }else{
-        cur_call.dtmf("*599", dtmf_options);
-    }
-});
-
-$("#attxbtn").click(function() {
-   if(isOutboundCall==true){
-        cur_call.dtmf("*699", dtmf_options);
-    }else{
-        cur_call.dtmf("*799", dtmf_options);
-    }
-});
-
-
+function terminateCurrCall() {
+    cur_call.hangup();
+    cur_call = null;
+    // resetOptionsTimer();
+}
 
 //BUTTON LOGIC - OPTIONS TOOLS
+//DONE:
 $("#mutebtn").click(function() {
     if (isOnMute) {
         cur_call.unmute();
@@ -771,11 +576,7 @@ $("#mutebtn").click(function() {
 $("#holdbtn").click(function() {
     if (isOnHold==false){
         isOnHold = true;
-        if(isOutboundCall==true){
-            cur_call.dtmf("*299", dtmf_options);
-        }else{
-            cur_call.dtmf("*399", dtmf_options);
-        }
+        cur_call.dtmf(isOutboundCall ? "*299" : "*399", dtmf_options);
         $("#unholdbtn").show();
         console.error("HOLD begins");
     }
@@ -809,122 +610,99 @@ $("#callbackbtn").click(function() {
 });
 
 $("#recordcallbtn").click(function() {
+    cur_call.dtmf("*");
+    cur_call.dtmf("2");
+
+    isRecording = !isRecording;
+    
     if (isRecording) {
-        cur_call.dtmf("*");
-        cur_call.dtmf("2");
-        isRecording = false;
         $(this).removeClass('btn-danger').addClass('btn-warning');
     } else {
-        cur_call.dtmf("*");
-        cur_call.dtmf("2");
-        isRecording = true;
-
         $(this).removeClass('btn-warning').addClass('btn-danger');
     }
 });
 
 $("#dndbtn").click(function() {
+    isDnd = !isDnd;
     if (isDnd) {
-        isDnd = false;
         $(this).removeClass('btn-danger').addClass('btn-warning');
     } else {
-        isDnd = true;
         $(this).removeClass('btn-warning').addClass('btn-danger');
     }
 });
 
 $("#ringbtn").click(function() {
+    isNoRing = !isNoRing;
     if (isNoRing) {
-        isNoRing = false;
         $(this).removeClass('btn-danger').addClass('btn-warning');
     } else {
-        isNoRing = true;
         $(this).removeClass('btn-warning').addClass('btn-danger');
     }
 });
 
 $("#autoanswerbtn").click(function() {
+    isAutoAnswer = !isAutoAnswer;
     if (isAutoAnswer) {
-        isAutoAnswer = false;
         $(this).removeClass('btn-danger').addClass('btn-warning');
     } else {
-        isAutoAnswer = true;
         $(this).removeClass('btn-warning').addClass('btn-danger');
     }
 });
 
 //DIAL BUTTONS LOGIC - INCOMING CALL
 $("#ext1btn").click(function() {
-    $("#ext").val($("#ext").val() + "1");
-    var input = document.getElementById('calling_input');
-    input.value = $("#ext").val(); 
+    buttonExtLogic("1");
 });
 
 $("#ext2btn").click(function() {
-    $("#ext").val($("#ext").val() + "2");
-    var input = document.getElementById('calling_input');
-    input.value = $("#ext").val(); 
+    buttonExtLogic("2");
 });
 
 $("#ext3btn").click(function() {
-    $("#ext").val($("#ext").val() + "3");
-    var input = document.getElementById('calling_input');
-    input.value = $("#ext").val(); 
+    buttonExtLogic("3");
 });
 
 $("#ext4btn").click(function() {
-    $("#ext").val($("#ext").val() + "4");
-    var input = document.getElementById('calling_input');
-    input.value = $("#ext").val(); 
+    buttonExtLogic("4");
 });
 
 $("#ext5btn").click(function() {
-    $("#ext").val($("#ext").val() + "5");
-    var input = document.getElementById('calling_input');
-    input.value = $("#ext").val(); 
+    buttonExtLogic("5");
 });
 
 $("#ext6btn").click(function() {
-    $("#ext").val($("#ext").val() + "6");
-    var input = document.getElementById('calling_input');
-    input.value = $("#ext").val(); 
+    buttonExtLogic("6");
 });
 
 $("#ext7btn").click(function() {
-    $("#ext").val($("#ext").val() + "7");
-    var input = document.getElementById('calling_input');
-    input.value = $("#ext").val(); 
+    buttonExtLogic("7");
 });
 
 $("#ext8btn").click(function() {
-    $("#ext").val($("#ext").val() + "8");
-    var input = document.getElementById('calling_input');
-    input.value = $("#ext").val(); 
+    buttonExtLogic("8");
 });
 
 $("#ext9btn").click(function() {
-    $("#ext").val($("#ext").val() + "9");
-    var input = document.getElementById('calling_input');
-    input.value = $("#ext").val(); 
+    buttonExtLogic("9");
 });
 
 $("#ext0btn").click(function() {
-    $("#ext").val($("#ext").val() + "0");
-    var input = document.getElementById('calling_input');
-    input.value = $("#ext").val(); 
+    buttonExtLogic("0");
 });
 
 $("#extstarbtn").click(function() {
-    $("#ext").val($("#ext").val() + "*");
-    var input = document.getElementById('calling_input');
-    input.value = $("#ext").val(); 
+    buttonExtLogic("*");
 });
 
 $("#extpoundbtn").click(function() {
-    $("#ext").val($("#ext").val() + "#");
-    var input = document.getElementById('calling_input');
-    input.value = $("#ext").val(); 
+    buttonExtLogic("#");
 });
+
+function buttonExtLogic(button) {
+    $("#ext").val($("#ext").val() + button);
+    var input = document.getElementById('calling_input');
+    input.value = $("#ext").val();
+}
 
 //DIAL BUTTONS LOGIC - IN CALL
 $("#dtmf1btn").click(function() {
@@ -984,83 +762,27 @@ $("#calling_input").keyup(function(event) {
 });
 
 function init() {
-    
+    prov = null;
+
+    if (cur_prov === 'SIP.js') {
+        prov = new SIPjsProvider();
+    } else if (cur_prov === 'infobip') {
+        prov = new InfobipProvider();
+    }
+
     var login;
     var yourname;
 
-    var nameDomain;
-    var nameProxy;
-    var uri;
-    var password;
-    var wssport;
-
     cur_call = null;
-    resetOptionsTimer();
+    // resetOptionsTimer();
+    login = $("#login").val();
     yourname = $("#yourname").val();
-    nameDomain = $("#domain").val();
-    nameProxy = $("#proxy").val();
-    wssport = $("#port").val();
-    which_server = "wss://" + nameProxy + ":" + wssport;
 
     if (yourname === "") {
         yourname = $("#login").val();
     }
-
-    login = $("#login").val();
-    password = $("#passwd").val();
-
-    uri = login + "@" + nameDomain;
-
-    //console.error("uri: " + uri);
-
-    ua = new SIP.UA({
-        wsServers: which_server,
-        uri: uri,
-        password: password,
-        userAgentString: 'SIP.js/0.7.8 SaraPhone 04',
-        traceSip: true,
-        displayName: yourname,
-        iceCheckingTimeout: 1000,
-        registerExpires: 120,
-        allowLegacyNotifications: true,
-        hackWssInTransport: true,
-        wsServerMaxReconnection: 5000,
-        wsServerReconnectionTimeout: 1,
-        connectionRecoveryMaxInterval: 3,
-        connectionRecoveryMinInterval: 2,
-        log: {
-            level: 2,
-            connector: function(level, category, label, content) {
-                var str = content;
-                var patt2 = new RegExp("WebSocket abrupt disconnection");
-                var res2 = patt2.exec(str);
-/*
-                var patt = new RegExp("OPTIONS sip");
-                var res = patt.exec(str);
-
-                if (res) {
-                    resetOptionsTimer();
-                }
-*/
-                if (res2) {
-                    if (gotopanel == false){
-                        console.error('WebSocket ABRUPT DISCONNECTION');
-			tempAlert("- WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - WebSocket ABRUPT DISCONNECTION - ",10000);
-                    }
-                }
-            },
-        }
-    });
-
-    ua.on('notify', handleNotify);
-    ua.on('invite', handleInvite);
-    ua.on('disconnected', function() {
-        console.error('DISCONNECTED');
-        //alert("DO YOU HAVE AUTHORIZED SSL CERTS FOR PORT 7443 ???? - READ THE README! :) - NETWORK DISCONNECT, CLICK OK TO PROCEED");
-        if (gotopanel == false){
-		tempAlert("- NETWORK DISCONNECTED - NETWORK DISCONNECTED - NETWORK DISCONNECTED - NETWORK DISCONNECTED - DO YOU HAVE WSS PORT OPEN ON FIREWALL? DO YOU HAVE AUTHORIZED SSL CERTS? AND YOUR WSS CERTS, ARE AUTHORIZED? - READ THE README! :) - NETWORK DISCONNECTED - NETWORK DISCONNECTED - NETWORK DISCONNECTED - NETWORK DISCONNECTED - ",60000);
-        }
-    });
+ 
+    prov.connect(login, yourname);
 
     $("#isIncomingcall").hide();
 
@@ -1084,7 +806,6 @@ function init() {
                     cur_call.dtmf(key, dtmf_options);
                 }
             } else {
-
                 if (key === "#" || key === "*" || key === "0" || (i > 0 && i <= 9)) {
 
                     if (key === "0") $("#ext0btn").click();
@@ -1103,19 +824,11 @@ function init() {
             }
         }
     });
-
-    ua.once('registered', onRegistered.bind(cur_call));
-    ua.on('unregistered', function() {
-        console.error('UNREGISTERED');
-        if (gotopanel == false){
-		tempAlert("- UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - UNREGISTERED - ",3000);
-        }
-    });
 }
 
 $(window).load(function() {
     cur_call = null;
-    resetOptionsTimer();
+    // resetOptionsTimer();
     isAndroid = (navigator.userAgent.toLowerCase().indexOf('android') > -1);
     isIOS = /(iPad|iPhone|iPod)/g.test(navigator.userAgent);
 
@@ -1270,31 +983,7 @@ function setupCacheHandler() {
     }
 }
 
-//DEPRECATED
-function resetOptionsTimer() {
-/*
-    window.clearTimeout(callTimer);
-
-    callTimer = window.setTimeout(function() {
-        console.error("NETWORK DISCONNECT, NO OPTIONS SINCE 25000 msec");
-        beep(1000, 2);
-        if (cur_call) {
-            alert("NETWORK DISCONNECT, CLICK OK TO PROCEED");
-        }
-        $("#hangupbtn").trigger("click");
-        if (gotopanel == false){
-            location.reload();
-        }
-    }, 25000);
-*/
+function hideIncomingCall() {
+    $("#isIncomingcall").hide();
+    $("#isNotIncomingcall").show();
 }
-
-//DEPRECATED
-$("#phonebookbtn").click(function() {
-    var x = document.getElementById('phonebook');
-    if (x.style.display === 'none') {
-        x.style.display = 'block';
-    } else {
-        x.style.display = 'none';
-    }
-});

@@ -1,4 +1,4 @@
-class Call {
+class InfobipCall extends Call {
 
     constructor(incomingCall) {
         this.call = incomingCall;
@@ -20,7 +20,11 @@ class Call {
         return this.call.mute(shouldMute);
     }
 
-    sendDTMF(dtmf) {
+    unmute() {
+        return this.call.mute(false);
+    }
+
+    sendDTMF(dtmf, dtmf_options) {
         return this.call.sendDTMF(dtmf);
     }
 
@@ -39,5 +43,4 @@ class Call {
     onError(handler) {
         this.call.on(CallsApiEvent.ERROR, handler);
     }
-
 }
