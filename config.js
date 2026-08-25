@@ -24,9 +24,3 @@ const TELEPHONE_CONFIG = {
     apiHost: "https://k9v5ge.api.infobip.com"
   }
 }
-
-
-const PROVIDERS = {
-  infobip: InfobipProvider,
-  sip: SipProvider
-};
