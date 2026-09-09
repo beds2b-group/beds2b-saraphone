@@ -29,9 +29,9 @@
 
 'use strict';
 
-var cur_prov = 'SIP.js';
+// var cur_prov = 'SIP.js';
 // var cur_prov = 'twilio';
-// var cur_prov = "infobip";
+var cur_prov = "infobip";
 
 // MULTI-PROVIDER TODO:
 var cur_call = null;
@@ -129,11 +129,6 @@ function answerIncomingCall() {
     hideIncomingCall();
 
     cur_call = prov.answer(incomingsession);
-    cur_call.onEstablished(onAccepted.bind(cur_call));
-    cur_call.onHangup(onTerminated.bind(cur_call));
-    cur_call.onError(onTerminated.bind(cur_call));
-
-    console.log("Llamada aceptada desde API iframe.");
 }
 
  
@@ -234,17 +229,6 @@ function onTerminated2() {
     console.log('Onterminated2');
     cur_call = null;
     incomingsession = null;
-}
-
-function onAccepted() {
-    audioElement.pause();
-
-    $("#signin").hide();
-    $("#dial").hide();
-    $("#incall").show();
-
-    isOnMute = false;
-    $("#mutebtn").removeClass('btn-danger').addClass('btn-warning');
 }
 
 $("#asknotificationpermission").click(function() {
@@ -491,7 +475,7 @@ $("#delcallbtn").click(function() {
 
 
 $("#hangupbtn").click(function() {
-    if (cur_call) terminateCurrCall();
+    prov.hangup();
     $("#br").show();
     $("#ext").show();
     resetCallingVars();
@@ -704,6 +688,8 @@ function init() {
     }
  
     prov.connect(login, yourname);
+
+    console.log("Paso la conexión");
 
     $("#isIncomingcall").hide();
 
