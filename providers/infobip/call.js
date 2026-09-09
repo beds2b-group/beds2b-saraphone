@@ -1,6 +1,7 @@
 class InfobipCall extends Call {
 
     constructor(incomingCall) {
+        super();
         this.call = incomingCall;
     }
 

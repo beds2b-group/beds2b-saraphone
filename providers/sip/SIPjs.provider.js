@@ -2,6 +2,7 @@ class SIPjsProvider extends TelephonyProvider {
     constructor(incomingsession) {
         super();
         this.incomingsession = incomingsession;
+        this.cur_call = null;
     }
 
     connect(login, yourname) {
@@ -59,7 +60,7 @@ class SIPjsProvider extends TelephonyProvider {
             console.error('DISCONNECTED');
             //alert("DO YOU HAVE AUTHORIZED SSL CERTS FOR PORT 7443 ???? - READ THE README! :) - NETWORK DISCONNECT, CLICK OK TO PROCEED");
             if (gotopanel == false){
-            tempAlert("- NETWORK DISCONNECTED - NETWORK DISCONNECTED - NETWORK DISCONNECTED - NETWORK DISCONNECTED - DO YOU HAVE WSS PORT OPEN ON FIREWALL? DO YOU HAVE AUTHORIZED SSL CERTS? AND YOUR WSS CERTS, ARE AUTHORIZED? - READ THE README! :) - NETWORK DISCONNECTED - NETWORK DISCONNECTED - NETWORK DISCONNECTED - NETWORK DISCONNECTED - ",60000);
+                tempAlert("- NETWORK DISCONNECTED - NETWORK DISCONNECTED - NETWORK DISCONNECTED - NETWORK DISCONNECTED - DO YOU HAVE WSS PORT OPEN ON FIREWALL? DO YOU HAVE AUTHORIZED SSL CERTS? AND YOUR WSS CERTS, ARE AUTHORIZED? - READ THE README! :) - NETWORK DISCONNECTED - NETWORK DISCONNECTED - NETWORK DISCONNECTED - NETWORK DISCONNECTED - ",60000);
             }
         });
         ua.once('registered', this.onRegistered.bind(this));
@@ -73,7 +74,7 @@ class SIPjsProvider extends TelephonyProvider {
 
     }
 
-    answer(incomingsession) {
+    answer() {
         if (!this.incomingsession) {
             console.warn("No hay llamada entrante para aceptar.");
             return;
@@ -95,8 +96,12 @@ class SIPjsProvider extends TelephonyProvider {
             }
         });
 
-        return new SIPCall(this.incomingsession);
-    }
+        var cur_call = new SIPCall(this.incomingsession);
+        this.cur_call = cur_call;
+        cur_call.onEstablished(onAccepted.bind(cur_call));
+        cur_call.onHangup(onTerminated.bind(cur_call));
+        cur_call.onError(onTerminated.bind(cur_call));
+    } 
 
     reject() {
         if (!this.incomingsession) {
@@ -294,7 +299,36 @@ class SIPjsProvider extends TelephonyProvider {
         }
     }
 
-    onEstablished(){
+    onTerminated() {
+        audioElement.pause();
+        console.log('Onterminated');
         
+        $("#signin").hide();
+        $("#dial").show();
+        $("#incall").hide();
+        $("#ext").val("");
+
+        this.terminateCurrCall();   
+
+        isOnMute = false;
+        incomingsession = null;
+        resetCallingVars();
+    }
+
+    onAccepted(){
+        audioElement.pause();
+
+        $("#signin").hide();
+        $("#dial").hide();
+        $("#incall").show();
+
+        isOnMute = false;
+        $("#mutebtn").removeClass('btn-danger').addClass('btn-warning');
+    }
+
+    terminateCurrCall() {
+        if (!this.actualCall) return;
+        this.actualCall.hangup();
+        this.actualCall = null;
     }
 }
