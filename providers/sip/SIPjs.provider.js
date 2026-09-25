@@ -6,7 +6,6 @@ class SIPjsProvider extends TelephonyProvider {
     }
 
     connect(login, yourname) {
-
         var nameDomain;
         var nameProxy;
         var uri;
@@ -165,6 +164,10 @@ class SIPjsProvider extends TelephonyProvider {
         return new SIPCall(session);
     }
 
+    mute(isOnMute) {
+        this.cur_call.mute(isOnMute);
+    }
+
     
     handleInvite(s) {
         if (cur_call || isDnd) {
@@ -298,6 +301,36 @@ class SIPjsProvider extends TelephonyProvider {
             $("#calling_input").hide();
         }
     }
+    
+    doCall() {
+        this.terminateCurrCall();
+
+        isIncomingCall = false;
+        isOutboundCall = true;
+
+        cur_call = prov.dial($("#ext").val(), {
+            deviceId: $("#selectmic").val(),
+            remoteAudioElement: document.getElementById('audio')
+        });
+
+        cur_call.onEstablished(onAccepted.bind(cur_call));
+
+        cur_call.onError(function(reason) {
+            var span = document.getElementById('calling');
+            onTerminated(cur_call);
+            span.innerText = reason;
+        });
+
+        cur_call.onHangup(function(reason) {
+            var span = document.getElementById('calling');
+            onTerminated(cur_call);
+            span.innerText = reason || "...";
+        });
+
+        var span = document.getElementById('speakingwith');
+        var txt = document.createTextNode($("#ext").val());
+        span.innerText = txt.textContent;
+    }
 
     onTerminated() {
         audioElement.pause();
@@ -326,9 +359,26 @@ class SIPjsProvider extends TelephonyProvider {
         $("#mutebtn").removeClass('btn-danger').addClass('btn-warning');
     }
 
+    hangup() {
+        this.terminateCurrCall();
+    }
+
     terminateCurrCall() {
-        if (!this.actualCall) return;
-        this.actualCall.hangup();
-        this.actualCall = null;
+        if (!this.cur_call) return;
+        this.cur_call.hangup();
+        this.cur_call = null;
+    }
+
+    senddtmf(dtmf, dtmfOptions) {
+        if (!dtmfOptions) return this.cur_call.sendDTMF(dtmf);
+        this.cur_call.dtmf(dtmf, dtmfOptions);
+    }
+
+    resetCurrCall() {
+        this.cur_call = null;
+    }
+
+    isCurrentActiveCall() {
+        return this.cur_call !== null ? true : false;
     }
 }

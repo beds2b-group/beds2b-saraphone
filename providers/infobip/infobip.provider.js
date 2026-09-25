@@ -33,7 +33,7 @@ class InfobipProvider extends TelephonyProvider {
         this.infobip.connect();
 
         this.infobip.on(InfobipRTCEvent.CONNECTED, (event) => {
-            console.log('Connected to Infobip RTC Cloud with: %s', event.identity);
+            console.log('Connected to Infobip RTC Cloud with:');
             this.onRegistered();
         });
 
@@ -44,11 +44,19 @@ class InfobipProvider extends TelephonyProvider {
         
         this.infobip.on('incoming-application-call', (event) => {
             console.log(event);
-            // const call = new InfobipCall(event.incomingCall);
-            const call = event.incomingCall;
-            this.actualCall = call;
-            this.handleInvite(call);
+            this.actualCall = event.incomingCall;
+            this.handleInvite();
         });
+        
+        this.infobip.on('DTMF_COLLECTED', (event) => {
+            console.log(event);
+            this.startRecording();
+        });
+
+    }
+
+    recording() {
+        
     }
 
     answer() {
@@ -56,8 +64,6 @@ class InfobipProvider extends TelephonyProvider {
             console.warn("No hay llamada entrante para aceptar.");
             return;
         }
-
-        console.log('LLAMADA ENTRANTE ACEPTADA');
         
         this.actualCall.accept({
             audio: true,
@@ -65,7 +71,7 @@ class InfobipProvider extends TelephonyProvider {
         });
 
         this.actualCall.on("established", () => {
-            console.log("CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAL");
+            console.log("Llamada establecida");
             this.onAccepted();
         });
 
@@ -117,46 +123,48 @@ class InfobipProvider extends TelephonyProvider {
         span.innerText = txt.textContent + " (" + $("#yourname").val() + ")";
     }
 
-    handleInvite(s) {        
+    mute(inOnMute){
+        this.actualCall.mute(inOnMute);
+    }
+
+    handleInvite() {
+
         if (isDnd) {
             console.log("Llamada entrante rechazada por DND");
             this.actualCall.decline(); 
-        } else {
-            var span = document.getElementById('calling');
-            var txt = "---";
-            isIncomingCall = true;
-            isOutboundCall = false;
-            
-            //Arreglar el metodo obtener numero de telefono
+            return;
+        }
+        
+        var span = document.getElementById('calling');
+        var txt = "---";
+        isIncomingCall = true;
+        isOutboundCall = false;
+        
+        var telefono = this.actualCall.caller.identity;
+        console.log(telefono);
+        
+        span.innerText = "CALL FROM: " + telefono;
+        
+        $("#isIncomingcall").show();
+        $("#isNotIncomingcall").hide();
+        
+        //Metodo de cancelacion de llamadas entrantes
+        this.actualCall.on('hangup', event => {
+            this.onTerminated();
+        });
+        
+        if(!isIOS) 
+            notifyMe("CALL FROM: " + telefono);
 
-            console.log("Llamada entrante aceptada");
-            var telefono = this.actualCall.caller.identity;
-            console.log(telefono);
-            
-            // console.log("Hemos recibido la llamada entrante de: " + telefono);
-            span.innerText = "CALL FROM: " + telefono;
-                        
-            $("#isIncomingcall").show();
-            $("#isNotIncomingcall").hide();
-
-            //Metodo de cancelacion de llamadas entrantes
-            this.actualCall.once("hangup", onCancelled.bind(this.actualCall));
-            
-            if(!isIOS) 
-                notifyMe("CALL FROM: " + telefono);
-
-            if (isNoRing == false) {
-                audioElement.currentTime = 0;
-                audioElement.play();
-            }
-
-            if (isAutoAnswer == true || autoAnswerOnce == true) {
-                $("#anscallbtn").trigger("click");
-                autoAnswerOnce = false;
-            }
-
+        if (isNoRing == false) {
+            audioElement.currentTime = 0;
+            audioElement.play();
         }
 
+        if (isAutoAnswer == true || autoAnswerOnce == true) {
+            $("#anscallbtn").trigger("click");
+            autoAnswerOnce = false;
+        }
     }
 
     onAccepted() {
@@ -168,5 +176,97 @@ class InfobipProvider extends TelephonyProvider {
 
         isOnMute = false;
         $("#mutebtn").removeClass('btn-danger').addClass('btn-warning');
+    }
+
+    onCancelled() {
+        this.infobip = null;
+    }
+
+    onTerminated() {
+        audioElement.pause();
+        console.log('Onterminated');
+        
+        $("#signin").hide();
+        $("#dial").show();
+        $("#incall").hide();
+        $("#ext").val("");
+
+        this.terminateCurrCall();   
+
+        isOnMute = false;
+        incomingsession = null;
+        resetCallingVars();
+    }
+
+    hangup() {
+        this.terminateCurrCall();
+    }
+
+    terminateCurrCall() {
+        if (!this.actualCall) return;
+        this.actualCall.hangup();
+        this.actualCall = null;
+    }
+
+    doCall() {
+        this.terminateCurrCall();
+
+        const destination = $("#ext").val();
+
+        console.log("Llamando a:", destination);
+
+        isIncomingCall = false;
+        isOutboundCall = true;
+
+        this.actualCall = this.infobip.callPhone(destination);
+
+        this.actualCall.on('ringing', () => {
+            console.log("El teléfono está sonando");
+        });
+
+        this.actualCall.on('established', (event) => {
+            console.log("Llamada establecida");
+
+            const audio = document.getElementById("audio");
+
+            if (event.stream) {
+                audio.srcObject = event.stream;
+                audio.play();
+            }
+
+            this.onAccepted();
+        });
+
+        this.actualCall.on('hangup', (event) => {
+            console.log("Llamada finalizada", event);
+
+            this.actualCall = null;
+            this.onTerminated();
+        });
+
+        this.actualCall.on('error', (event) => {
+            console.error("Error en llamada:", event);
+
+            this.actualCall = null;
+            this.onTerminated();
+        });
+
+        $("#speakingwith").text(destination);
+    }
+
+    senddtmf(dtmf) {
+        this.actualCall.sendDTMF(dtmf);
+    }
+
+    resetCurrCall() {
+        this.actualCall = null;
+    }
+
+    isCurrentActiveCall() {
+        return this.actualCall !== null ? true : false;
+    }
+
+    isRecordAccepted() {
+        
     }
 }

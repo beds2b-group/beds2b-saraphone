@@ -34,7 +34,6 @@
 var cur_prov = "infobip";
 
 // MULTI-PROVIDER TODO:
-var cur_call = null;
 var prov = null;
 // MULTI-PROVIDER TODO:
 var ua;
@@ -113,7 +112,9 @@ window.addEventListener("message", function(event) {
             break;
 
         case "hangup-call":
-            if (cur_call) cur_call.hangup();
+            if (prov.isCurrentActiveCall()) {
+                prov.hangup();
+            }
             break;
 
         default:
@@ -127,15 +128,13 @@ window.addEventListener("message", function(event) {
 function answerIncomingCall() {
     audioElement.pause();
     hideIncomingCall();
-
-    cur_call = prov.answer(incomingsession);
+    prov.answer(incomingsession);
 }
 
  
 function rejectIncomingCall() {
     prov.reject();
     hideIncomingCall();
-
     console.log("Llamada rechazada desde API iframe.");
 }
 
@@ -210,27 +209,6 @@ function onCancelled() {
     resetCallingVars();
 }
 
-function onTerminated() {
-    audioElement.pause();
-    console.log('Onterminated');
-    
-    $("#signin").hide();
-    $("#dial").show();
-    $("#incall").hide();
-    $("#ext").val("");
-
-    if (cur_call) terminateCurrCall();
-    isOnMute = false;
-    incomingsession = null;
-    resetCallingVars();
-}
-
-function onTerminated2() {
-    console.log('Onterminated2');
-    cur_call = null;
-    incomingsession = null;
-}
-
 $("#asknotificationpermission").click(function() {
     if (isIOS) return;
 
@@ -300,69 +278,6 @@ function onRegisteredCommon(){
     isRegistered = true;
 }
 
-
-function onRegistered() {
-    if (cur_prov !== 'SIP.js') return;
-
-    var countpres = 1;
-
-    while (countpres < 61) {
-        if ($("#pres" + countpres).val()) {
-            presence_array[countpres] = ua.subscribe($("#pres" + countpres).val(), 'presence', {
-                expires: 120
-            });
-
-            const mycountpres = countpres;
-            presence_array[countpres].on('notify', function(notification) {
-                var presence = notification.request.body.match(/<dm:note>(.*)<\/dm:note>/i);
-
-                if (!presence) return;
- 
-                var ispresent = presence[1];
-                var btn = $("#pres" + mycountpres + "btn");
-
-                var estado;
-                if (ispresent.match(/unregistered/i)) {
-                    estado = 'btn-danger';
-                } else if (ispresent.match(/available/i) || ispresent.match(/closed/i)) {
-                    estado = 'btn-success';
-                } else {
-                    estado = 'btn-warning';
-                }
-
-                btn.removeClass('btn-success btn-warning btn-default btn-danger').addClass(estado);
-
-                var span = document.getElementById('ispresent' + mycountpres);
-                $("#pres" + mycountpres + "_label").val($("#pres" + mycountpres + "_label").val().substr(0, 10));
-
-                span.innerText = $("#pres" + mycountpres + "_label").val() + 
-                (ispresent.match(/available/i) || ispresent.match(/closed/i) ? '' : ": " + ispresent);
-            });
-
-            $("#pres" + mycountpres + "btn").click(function() {
-                $("#ext").val($("#pres" + mycountpres).val());
-                oldext=$("#ext").val();
-                docall();
-            });
-        } else {
-            $("#pres" + countpres + "btn").remove();
-        }
-        countpres++;
-    }
-
-    $("#webphone_blf").show();  
-
-    vmail_subscription = ua.subscribe($("#login").val() + '@' + $("#domain").val(), 'message-summary', {
-        extraHeaders: ['Accept: application/simple-message-summary'],
-        expires: 120
-    });
-    vmail_subscription.on('notify', prov.handleNotify);
-
-    if (isAndroid || isIOS) {
-        $("#calling_input").hide();
-    }
-}
-
 $("#checkvmailbtn").click(function() {
     $("#extstarbtn").click();
     $("#ext9btn").click();
@@ -406,38 +321,6 @@ function resetCallingVars() {
     span.innerText = "...";
 }
 
-function docall() {
-    if (cur_call) {
-        terminateCurrCall();
-    }
-
-    isIncomingCall = false;
-    isOutboundCall = true;
-
-    cur_call = prov.dial($("#ext").val(), {
-        deviceId: $("#selectmic").val(),
-        remoteAudioElement: document.getElementById('audio')
-    });
-
-    cur_call.onEstablished(onAccepted.bind(cur_call));
-
-    cur_call.onError(function(reason) {
-        var span = document.getElementById('calling');
-        onTerminated(cur_call);
-        span.innerText = reason;
-    });
-
-    cur_call.onHangup(function(reason) {
-        var span = document.getElementById('calling');
-        onTerminated(cur_call);
-        span.innerText = reason || "...";
-    });
-
-    var span = document.getElementById('speakingwith');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = txt.textContent;
-}
-
 function toggleDisplay(elementId) {
     var el = document.getElementById(elementId);
     el.style.display = (el.style.display === 'none') ? 'block' : 'none';
@@ -459,12 +342,11 @@ if (cur_prov !== 'SIP.js') {
 
 $("#callbtn").click(function() {
     if (!$("#ext").val()) return;
- 
     var regex1 = /#/g;
     var new_ext = $("#ext").val().replace(regex1, "_");
     $("#ext").val(new_ext);
     oldext=$("#ext").val();
-    docall();
+    prov.doCall();
 });
 
 $("#delcallbtn").click(function() {
@@ -485,15 +367,10 @@ $("#loginbtn").click(function() {
     init();
 });
 
-function terminateCurrCall() {
-    cur_call.hangup();
-    cur_call = null;
-}
-
 //BUTTON LOGIC - OPTIONS TOOLS
 $("#mutebtn").click(function() {
     isOnMute = !isOnMute;
-    cur_call.mute(isOnMute);
+    prov.mute(isOnMute);
     $(this).toggleClass('btn-danger', isOnMute).toggleClass('btn-warning', !isOnMute);
 });
 
@@ -501,7 +378,7 @@ $("#holdbtn").click(function() {
     if (isOnHold) return;
     
     isOnHold = true;
-    cur_call.dtmf(isOutboundCall ? "*299" : "*399", dtmf_options);
+    prov.senddtmf(isOutboundCall ? "*299" : "*399", dtmf_options);
     $("#unholdbtn").show();
     console.error("HOLD begins");
 
@@ -535,8 +412,8 @@ $("#callbackbtn").click(function() {
 });
 
 $("#recordcallbtn").click(function() {
-    cur_call.dtmf("*");
-    cur_call.dtmf("2");
+    prov.senddtmf("*");
+    prov.senddtmf("2");
 
     isRecording = !isRecording;
 });
@@ -610,51 +487,51 @@ function buttonExtLogic(button) {
 
 //DIAL BUTTONS LOGIC - IN CALL
 $("#dtmf1btn").click(function() {
-    cur_call.dtmf("1", dtmf_options);
+    prov.senddtmf("1", dtmf_options);
 });
 
 $("#dtmf2btn").click(function() {
-    cur_call.dtmf("2", dtmf_options);
+    prov.senddtmf("2", dtmf_options);
 });
 
 $("#dtmf3btn").click(function() {
-    cur_call.dtmf("3", dtmf_options);
+    prov.senddtmf("3", dtmf_options);
 });
 
 $("#dtmf4btn").click(function() {
-    cur_call.dtmf("4", dtmf_options);
+    prov.senddtmf("4", dtmf_options);
 });
 
 $("#dtmf5btn").click(function() {
-    cur_call.dtmf("5", dtmf_options);
+    prov.senddtmf("5", dtmf_options);
 });
 
 $("#dtmf6btn").click(function() {
-    cur_call.dtmf("6", dtmf_options);
+    prov.senddtmf("6", dtmf_options);
 });
 
 $("#dtmf7btn").click(function() {
-    cur_call.dtmf("7", dtmf_options);
+    prov.senddtmf("7", dtmf_options);
 });
 
 $("#dtmf8btn").click(function() {
-    cur_call.dtmf("8", dtmf_options);
+    prov.senddtmf("8", dtmf_options);
 });
 
 $("#dtmf9btn").click(function() {
-    cur_call.dtmf("9", dtmf_options);
+    prov.senddtmf("9", dtmf_options);
 });
 
 $("#dtmf0btn").click(function() {
-    cur_call.dtmf("0", dtmf_options);
+    prov.senddtmf("0", dtmf_options);
 });
 
 $("#dtmfstarbtn").click(function() {
-    cur_call.dtmf("*", dtmf_options);
+    prov.senddtmf("*", dtmf_options);
 });
 
 $("#dtmfpoundbtn").click(function() {
-    cur_call.dtmf("#", dtmf_options);
+    prov.senddtmf("#", dtmf_options);
 });
 
 //Call on enter key pressed in input field
@@ -678,7 +555,6 @@ function init() {
     var login;
     var yourname;
 
-    cur_call = null;
     // resetOptionsTimer();
     login = $("#login").val();
     yourname = $("#yourname").val();
@@ -696,7 +572,7 @@ function init() {
     $(document).keyup(function(event) {
         if (event.keyCode != 13 || event.shiftKey) return;
         
-        if (isRegistered && !cur_call)
+        if (isRegistered && !prov.isCurrentActiveCall())
             $("#callbtn").trigger("click");
     });
 
@@ -709,8 +585,8 @@ function init() {
 
         if (!(key === "#" || key === "*" || key === "0" || (i > 0 && i <= 9))) return;
 
-        if (cur_call) {
-            cur_call.dtmf(key, dtmf_options);
+        if (prov.isCurrentActiveCall()) {
+            prov.senddtmf(key, dtmf_options);
             return;
         }
 
@@ -730,7 +606,6 @@ function init() {
 }
 
 $(window).load(function() {
-    cur_call = null;
     // resetOptionsTimer();
     isAndroid = (navigator.userAgent.toLowerCase().indexOf('android') > -1);
     isIOS = /(iPad|iPhone|iPod)/g.test(navigator.userAgent);
