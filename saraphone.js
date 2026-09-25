@@ -219,16 +219,10 @@ function onTerminated() {
     $("#incall").hide();
     $("#ext").val("");
 
-    if (cur_call) terminateCurrCall();
+    prov.terminateCurrCall();
     isOnMute = false;
     incomingsession = null;
     resetCallingVars();
-}
-
-function onTerminated2() {
-    console.log('Onterminated2');
-    cur_call = null;
-    incomingsession = null;
 }
 
 $("#asknotificationpermission").click(function() {
@@ -300,69 +294,6 @@ function onRegisteredCommon(){
     isRegistered = true;
 }
 
-
-function onRegistered() {
-    if (cur_prov !== 'SIP.js') return;
-
-    var countpres = 1;
-
-    while (countpres < 61) {
-        if ($("#pres" + countpres).val()) {
-            presence_array[countpres] = ua.subscribe($("#pres" + countpres).val(), 'presence', {
-                expires: 120
-            });
-
-            const mycountpres = countpres;
-            presence_array[countpres].on('notify', function(notification) {
-                var presence = notification.request.body.match(/<dm:note>(.*)<\/dm:note>/i);
-
-                if (!presence) return;
- 
-                var ispresent = presence[1];
-                var btn = $("#pres" + mycountpres + "btn");
-
-                var estado;
-                if (ispresent.match(/unregistered/i)) {
-                    estado = 'btn-danger';
-                } else if (ispresent.match(/available/i) || ispresent.match(/closed/i)) {
-                    estado = 'btn-success';
-                } else {
-                    estado = 'btn-warning';
-                }
-
-                btn.removeClass('btn-success btn-warning btn-default btn-danger').addClass(estado);
-
-                var span = document.getElementById('ispresent' + mycountpres);
-                $("#pres" + mycountpres + "_label").val($("#pres" + mycountpres + "_label").val().substr(0, 10));
-
-                span.innerText = $("#pres" + mycountpres + "_label").val() + 
-                (ispresent.match(/available/i) || ispresent.match(/closed/i) ? '' : ": " + ispresent);
-            });
-
-            $("#pres" + mycountpres + "btn").click(function() {
-                $("#ext").val($("#pres" + mycountpres).val());
-                oldext=$("#ext").val();
-                docall();
-            });
-        } else {
-            $("#pres" + countpres + "btn").remove();
-        }
-        countpres++;
-    }
-
-    $("#webphone_blf").show();  
-
-    vmail_subscription = ua.subscribe($("#login").val() + '@' + $("#domain").val(), 'message-summary', {
-        extraHeaders: ['Accept: application/simple-message-summary'],
-        expires: 120
-    });
-    vmail_subscription.on('notify', prov.handleNotify);
-
-    if (isAndroid || isIOS) {
-        $("#calling_input").hide();
-    }
-}
-
 $("#checkvmailbtn").click(function() {
     $("#extstarbtn").click();
     $("#ext9btn").click();
@@ -406,38 +337,6 @@ function resetCallingVars() {
     span.innerText = "...";
 }
 
-function docall() {
-    if (cur_call) {
-        terminateCurrCall();
-    }
-
-    isIncomingCall = false;
-    isOutboundCall = true;
-
-    cur_call = prov.dial($("#ext").val(), {
-        deviceId: $("#selectmic").val(),
-        remoteAudioElement: document.getElementById('audio')
-    });
-
-    cur_call.onEstablished(onAccepted.bind(cur_call));
-
-    cur_call.onError(function(reason) {
-        var span = document.getElementById('calling');
-        onTerminated(cur_call);
-        span.innerText = reason;
-    });
-
-    cur_call.onHangup(function(reason) {
-        var span = document.getElementById('calling');
-        onTerminated(cur_call);
-        span.innerText = reason || "...";
-    });
-
-    var span = document.getElementById('speakingwith');
-    var txt = document.createTextNode($("#ext").val());
-    span.innerText = txt.textContent;
-}
-
 function toggleDisplay(elementId) {
     var el = document.getElementById(elementId);
     el.style.display = (el.style.display === 'none') ? 'block' : 'none';
@@ -459,12 +358,11 @@ if (cur_prov !== 'SIP.js') {
 
 $("#callbtn").click(function() {
     if (!$("#ext").val()) return;
- 
     var regex1 = /#/g;
     var new_ext = $("#ext").val().replace(regex1, "_");
     $("#ext").val(new_ext);
     oldext=$("#ext").val();
-    docall();
+    prov.doCall();
 });
 
 $("#delcallbtn").click(function() {
@@ -485,15 +383,10 @@ $("#loginbtn").click(function() {
     init();
 });
 
-function terminateCurrCall() {
-    cur_call.hangup();
-    cur_call = null;
-}
-
 //BUTTON LOGIC - OPTIONS TOOLS
 $("#mutebtn").click(function() {
     isOnMute = !isOnMute;
-    cur_call.mute(isOnMute);
+    prov.mute(isOnMute);
     $(this).toggleClass('btn-danger', isOnMute).toggleClass('btn-warning', !isOnMute);
 });
 
