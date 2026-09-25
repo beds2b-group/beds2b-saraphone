@@ -34,7 +34,6 @@
 var cur_prov = "infobip";
 
 // MULTI-PROVIDER TODO:
-var cur_call = null;
 var prov = null;
 // MULTI-PROVIDER TODO:
 var ua;
@@ -113,7 +112,9 @@ window.addEventListener("message", function(event) {
             break;
 
         case "hangup-call":
-            if (cur_call) cur_call.hangup();
+            if (prov.isCurrentActiveCall()) {
+                prov.hangup();
+            }
             break;
 
         default:
@@ -127,15 +128,13 @@ window.addEventListener("message", function(event) {
 function answerIncomingCall() {
     audioElement.pause();
     hideIncomingCall();
-
-    cur_call = prov.answer(incomingsession);
+    prov.answer(incomingsession);
 }
 
  
 function rejectIncomingCall() {
     prov.reject();
     hideIncomingCall();
-
     console.log("Llamada rechazada desde API iframe.");
 }
 
@@ -206,21 +205,6 @@ function onCancelled() {
     audioElement.pause();
     console.log('cancelled');
     hideIncomingCall();
-    incomingsession = null;
-    resetCallingVars();
-}
-
-function onTerminated() {
-    audioElement.pause();
-    console.log('Onterminated');
-    
-    $("#signin").hide();
-    $("#dial").show();
-    $("#incall").hide();
-    $("#ext").val("");
-
-    prov.terminateCurrCall();
-    isOnMute = false;
     incomingsession = null;
     resetCallingVars();
 }
@@ -394,7 +378,7 @@ $("#holdbtn").click(function() {
     if (isOnHold) return;
     
     isOnHold = true;
-    cur_call.dtmf(isOutboundCall ? "*299" : "*399", dtmf_options);
+    prov.senddtmf(isOutboundCall ? "*299" : "*399", dtmf_options);
     $("#unholdbtn").show();
     console.error("HOLD begins");
 
@@ -428,8 +412,8 @@ $("#callbackbtn").click(function() {
 });
 
 $("#recordcallbtn").click(function() {
-    cur_call.dtmf("*");
-    cur_call.dtmf("2");
+    prov.senddtmf("*");
+    prov.senddtmf("2");
 
     isRecording = !isRecording;
 });
@@ -503,51 +487,51 @@ function buttonExtLogic(button) {
 
 //DIAL BUTTONS LOGIC - IN CALL
 $("#dtmf1btn").click(function() {
-    cur_call.dtmf("1", dtmf_options);
+    prov.senddtmf("1", dtmf_options);
 });
 
 $("#dtmf2btn").click(function() {
-    cur_call.dtmf("2", dtmf_options);
+    prov.senddtmf("2", dtmf_options);
 });
 
 $("#dtmf3btn").click(function() {
-    cur_call.dtmf("3", dtmf_options);
+    prov.senddtmf("3", dtmf_options);
 });
 
 $("#dtmf4btn").click(function() {
-    cur_call.dtmf("4", dtmf_options);
+    prov.senddtmf("4", dtmf_options);
 });
 
 $("#dtmf5btn").click(function() {
-    cur_call.dtmf("5", dtmf_options);
+    prov.senddtmf("5", dtmf_options);
 });
 
 $("#dtmf6btn").click(function() {
-    cur_call.dtmf("6", dtmf_options);
+    prov.senddtmf("6", dtmf_options);
 });
 
 $("#dtmf7btn").click(function() {
-    cur_call.dtmf("7", dtmf_options);
+    prov.senddtmf("7", dtmf_options);
 });
 
 $("#dtmf8btn").click(function() {
-    cur_call.dtmf("8", dtmf_options);
+    prov.senddtmf("8", dtmf_options);
 });
 
 $("#dtmf9btn").click(function() {
-    cur_call.dtmf("9", dtmf_options);
+    prov.senddtmf("9", dtmf_options);
 });
 
 $("#dtmf0btn").click(function() {
-    cur_call.dtmf("0", dtmf_options);
+    prov.senddtmf("0", dtmf_options);
 });
 
 $("#dtmfstarbtn").click(function() {
-    cur_call.dtmf("*", dtmf_options);
+    prov.senddtmf("*", dtmf_options);
 });
 
 $("#dtmfpoundbtn").click(function() {
-    cur_call.dtmf("#", dtmf_options);
+    prov.senddtmf("#", dtmf_options);
 });
 
 //Call on enter key pressed in input field
@@ -571,7 +555,6 @@ function init() {
     var login;
     var yourname;
 
-    cur_call = null;
     // resetOptionsTimer();
     login = $("#login").val();
     yourname = $("#yourname").val();
@@ -589,7 +572,7 @@ function init() {
     $(document).keyup(function(event) {
         if (event.keyCode != 13 || event.shiftKey) return;
         
-        if (isRegistered && !cur_call)
+        if (isRegistered && !prov.isCurrentActiveCall())
             $("#callbtn").trigger("click");
     });
 
@@ -602,8 +585,8 @@ function init() {
 
         if (!(key === "#" || key === "*" || key === "0" || (i > 0 && i <= 9))) return;
 
-        if (cur_call) {
-            cur_call.dtmf(key, dtmf_options);
+        if (prov.isCurrentActiveCall()) {
+            prov.senddtmf(key, dtmf_options);
             return;
         }
 
@@ -623,7 +606,6 @@ function init() {
 }
 
 $(window).load(function() {
-    cur_call = null;
     // resetOptionsTimer();
     isAndroid = (navigator.userAgent.toLowerCase().indexOf('android') > -1);
     isIOS = /(iPad|iPhone|iPod)/g.test(navigator.userAgent);

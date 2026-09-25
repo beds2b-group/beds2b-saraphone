@@ -33,7 +33,7 @@ class InfobipProvider extends TelephonyProvider {
         this.infobip.connect();
 
         this.infobip.on(InfobipRTCEvent.CONNECTED, (event) => {
-            console.log('Connected to Infobip RTC Cloud with: %s', event.identity);
+            console.log('Connected to Infobip RTC Cloud with:');
             this.onRegistered();
         });
 
@@ -44,11 +44,19 @@ class InfobipProvider extends TelephonyProvider {
         
         this.infobip.on('incoming-application-call', (event) => {
             console.log(event);
-            // const call = new InfobipCall(event.incomingCall);
-            const call = event.incomingCall;
-            this.actualCall = call;
-            this.handleInvite(call);
+            this.actualCall = event.incomingCall;
+            this.handleInvite();
         });
+        
+        this.infobip.on('DTMF_COLLECTED', (event) => {
+            console.log(event);
+            this.startRecording();
+        });
+
+    }
+
+    recording() {
+        
     }
 
     answer() {
@@ -56,8 +64,6 @@ class InfobipProvider extends TelephonyProvider {
             console.warn("No hay llamada entrante para aceptar.");
             return;
         }
-
-        console.log('LLAMADA ENTRANTE ACEPTADA');
         
         this.actualCall.accept({
             audio: true,
@@ -121,51 +127,44 @@ class InfobipProvider extends TelephonyProvider {
         this.actualCall.mute(inOnMute);
     }
 
-    handleInvite(s) {
+    handleInvite() {
+
         if (isDnd) {
             console.log("Llamada entrante rechazada por DND");
             this.actualCall.decline(); 
-        } else {
-            var span = document.getElementById('calling');
-            var txt = "---";
-            isIncomingCall = true;
-            isOutboundCall = false;
-            
-            //Arreglar el metodo obtener numero de telefono
+            return;
+        }
+        
+        var span = document.getElementById('calling');
+        var txt = "---";
+        isIncomingCall = true;
+        isOutboundCall = false;
+        
+        var telefono = this.actualCall.caller.identity;
+        console.log(telefono);
+        
+        span.innerText = "CALL FROM: " + telefono;
+        
+        $("#isIncomingcall").show();
+        $("#isNotIncomingcall").hide();
+        
+        //Metodo de cancelacion de llamadas entrantes
+        this.actualCall.on('hangup', event => {
+            this.onTerminated();
+        });
+        
+        if(!isIOS) 
+            notifyMe("CALL FROM: " + telefono);
 
-            console.log("Llamada entrante aceptada");
-            var telefono = this.actualCall.caller.identity;
-            console.log(telefono);
-            
-            // console.log("Hemos recibido la llamada entrante de: " + telefono);
-            span.innerText = "CALL FROM: " + telefono;
-                        
-            $("#isIncomingcall").show();
-            $("#isNotIncomingcall").hide();
-
-            //Metodo de cancelacion de llamadas entrantes
-            this.actualCall.once("hangup", onCancelled.bind(this.actualCall));
-            this.actualCall.on('hangup', event => {
-                console.log(event);
-                this.onTerminated();
-            });
-            console.log("Pasa por el hungup de la llamada entrante");
-            
-            if(!isIOS) 
-                notifyMe("CALL FROM: " + telefono);
-
-            if (isNoRing == false) {
-                audioElement.currentTime = 0;
-                audioElement.play();
-            }
-
-            if (isAutoAnswer == true || autoAnswerOnce == true) {
-                $("#anscallbtn").trigger("click");
-                autoAnswerOnce = false;
-            }
-
+        if (isNoRing == false) {
+            audioElement.currentTime = 0;
+            audioElement.play();
         }
 
+        if (isAutoAnswer == true || autoAnswerOnce == true) {
+            $("#anscallbtn").trigger("click");
+            autoAnswerOnce = false;
+        }
     }
 
     onAccepted() {
@@ -253,5 +252,21 @@ class InfobipProvider extends TelephonyProvider {
         });
 
         $("#speakingwith").text(destination);
+    }
+
+    senddtmf(dtmf) {
+        this.actualCall.sendDTMF(dtmf);
+    }
+
+    resetCurrCall() {
+        this.actualCall = null;
+    }
+
+    isCurrentActiveCall() {
+        return this.actualCall !== null ? true : false;
+    }
+
+    isRecordAccepted() {
+        
     }
 }

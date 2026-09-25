@@ -6,7 +6,6 @@ class SIPjsProvider extends TelephonyProvider {
     }
 
     connect(login, yourname) {
-
         var nameDomain;
         var nameProxy;
         var uri;
@@ -368,5 +367,18 @@ class SIPjsProvider extends TelephonyProvider {
         if (!this.cur_call) return;
         this.cur_call.hangup();
         this.cur_call = null;
+    }
+
+    senddtmf(dtmf, dtmfOptions) {
+        if (!dtmfOptions) return this.cur_call.sendDTMF(dtmf);
+        this.cur_call.dtmf(dtmf, dtmfOptions);
+    }
+
+    resetCurrCall() {
+        this.cur_call = null;
+    }
+
+    isCurrentActiveCall() {
+        return this.cur_call !== null ? true : false;
     }
 }
