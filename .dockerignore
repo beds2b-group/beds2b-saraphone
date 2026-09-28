@@ -2,3 +2,7 @@
 .github
 node_modules
 README.md
+saraphone-voice
+**/node_modules
+**/.env
+**/.env.*
