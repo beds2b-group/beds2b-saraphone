@@ -4,7 +4,7 @@ const SARAPHONE_CONFIG = {
   yourname: "Senator Agent",
   domain: "contactcenter.it.senator.tools",
   proxy: "contactcenter.it.senator.tools",
-  port: "8089/wss",
+  port: "8089/ws",
   pres1: "",
   pres1_label: "",
   pres2: "",

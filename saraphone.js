@@ -1064,9 +1064,16 @@ function init() {
     });
 
     $(document).keypress(function(event) {
+        var target = event.target;
+        var targetTag = target && target.tagName ? target.tagName.toLowerCase() : "";
+        var isEditableTarget = targetTag === "input" || targetTag === "textarea" || targetTag === "select" || (target && target.isContentEditable);
+
+        if (isEditableTarget) {
+            return;
+        }
+
         var key = String.fromCharCode(event.keyCode || event.charCode);
         var i = parseInt(key);
-        var tag = event.target.tagName.toLowerCase();
         if (isRegistered) {
             if (cur_call) {
                 if (key === "#" || key === "*" || key === "0" || (i > 0 && i <= 9)) {
