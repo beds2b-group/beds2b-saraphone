@@ -30,8 +30,8 @@
 'use strict';
 
 // var cur_prov = 'SIP.js';
-// var cur_prov = 'twilio';
-var cur_prov = "infobip";
+var cur_prov = 'twilio';
+// var cur_prov = "infobip";
 
 // MULTI-PROVIDER TODO:
 var prov = null;
@@ -544,12 +544,14 @@ $("#calling_input").keyup(function(event) {
 
 function init() {
     prov = null;
-
-
+    
     if (cur_prov === 'SIP.js') {
         prov = new SIPjsProvider();
     } else if (cur_prov === 'infobip') {
         prov = new InfobipProvider();
+    }
+    else if (cur_prov === 'twilio') {
+        prov = new TwilioProvider();
     }
 
     var login;
