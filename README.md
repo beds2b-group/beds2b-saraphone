@@ -29,6 +29,18 @@ Software Requirements
 - or
 - WSS SIP Server (FreeSWITCH, Asterisk, OpenSIPS, Kamailio, etc) + Web Server (Apache, Nginx, etc)
 
+Infobip Authorization
+--------------------------------------
+
+Create a local `.env` file from `.env.example` and set your real Infobip API key:
+
+```
+INFOBIP_API_HOST=k9v5ge.api.infobip.com
+INFOBIP_API_KEY=your-real-infobip-api-key
+```
+
+The browser calls `/api/infobip/...`; Nginx adds the `Authorization` header from the container environment so the API key is not exposed in frontend JavaScript.
+
 How to Install SaraPhone on FusionPBX
 ----------------------------
 
