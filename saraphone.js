@@ -267,6 +267,7 @@ function onRegisteredCommon(){
     $("#signin").hide();
     $("#dial").show();
     $("#incall").hide();
+    hideAgents();
     $("#ext").val("");
     resetCallingVars();
 
@@ -318,7 +319,7 @@ $("#rejcallbtn").click(function() {
 function resetCallingVars() {
     var span = document.getElementById('calling');
     $("#calling_input").val("");
-    span.innerText = "...";
+    span.innerText = "";
 }
 
 function toggleDisplay(elementId) {
@@ -355,6 +356,191 @@ $("#delcallbtn").click(function() {
     $("#hangupbtn").trigger("click");
 });
 
+
+//AGENTS
+// Lista de agentes: SARAPHONE_CONFIG.agents = [{ name, ext, status: 'available'|'oncall'|'away', since }]
+// "since" son los segundos que lleva en llamada. SARAPHONE_CONFIG.role = 'controller' activa Listen.
+var defaultAgents = [
+    { name: 'Laura Gómez', ext: '55002', status: 'available' },
+    { name: 'Marc Puig', ext: '55003', status: 'oncall', since: 225 },
+    { name: 'Núria Vidal', ext: '55004', status: 'available' },
+    { name: 'Jordi Serra', ext: '55005', status: 'oncall', since: 731 },
+    { name: 'Ana Ruiz', ext: '55006', status: 'available' },
+    { name: 'Pau Martí', ext: '55007', status: 'away' },
+    { name: 'Elena Soler', ext: '55008', status: 'oncall', since: 64 },
+    { name: 'David Roca', ext: '55009', status: 'available' }
+];
+var agentsSelected = null;
+var agentsTimer = null;
+var agentsOpenedAt = 0;
+var agentsReturnTo = '#dial';
+// Abierta desde ringing u oncall: cada agente muestra su botón de llamada y no se selecciona.
+// Abierta desde dial: sin botón por agente, se selecciona y se llama desde el pie.
+var agentsBusy = false;
+var agentsHintLocked = false;
+
+function getAgents() {
+    if (typeof SARAPHONE_CONFIG !== 'undefined' && Array.isArray(SARAPHONE_CONFIG.agents))
+        return SARAPHONE_CONFIG.agents;
+    return defaultAgents;
+}
+
+function isController() {
+    return typeof SARAPHONE_CONFIG !== 'undefined' && SARAPHONE_CONFIG.role === 'controller';
+}
+
+function agentInitials(name) {
+    return name.split(' ').filter(Boolean).slice(0, 2).map(function(w) { return w[0]; }).join('').toUpperCase();
+}
+
+function fmtSecs(x) {
+    var pad = function(n) { return String(n).padStart(2, '0'); };
+    return pad(Math.floor(x / 60)) + ':' + pad(x % 60);
+}
+
+function renderAgents() {
+    var agents = getAgents();
+    var elapsed = Math.floor((Date.now() - agentsOpenedAt) / 1000);
+    var list = $("#agents_list").empty();
+
+    $("#agents_role").toggle(isController());
+
+    if (agents.length === 0)
+        list.append($('<div class="agents-empty">').text('No hay agentes disponibles'));
+
+    agents.forEach(function(a, i) {
+        var status = a.status || 'available';
+        var badge = status === 'oncall' ? 'On call ' + fmtSecs((a.since || 0) + elapsed)
+                  : status === 'away' ? 'Away' : 'Available';
+
+        var item = $('<div class="agent-item">').toggleClass('selected', agentsSelected === i);
+        var avatar = $('<div class="agent-avatar">').text(agentInitials(a.name))
+            .append($('<span class="agent-dot">').addClass(status));
+        var info = $('<div class="agent-info">')
+            .append($('<div class="agent-name">').text(a.name))
+            .append($('<div class="agent-meta">')
+                .append($('<span class="agent-badge">').addClass(status).text(badge))
+                .append($('<span>').text(a.ext)));
+
+        item.append(avatar, info);
+
+        if (isController() && status === 'oncall' && !agentsBusy) {
+            var listen = $('<button class="agent-listen" data-inline="true">')
+                .html('<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0"></path><path d="M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4"></path></svg>Listen')
+                .click(function(e) {
+                    e.stopPropagation();
+                    callAgent(listenPrefix() + a.ext);
+                });
+            item.append(listen);
+        }
+
+        if (agentsBusy) item.append($('<button class="agent-select" data-inline="true" title="Llamar" aria-label="Llamar">')
+            .html('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg>')
+            .click(function(e) {
+                e.stopPropagation();
+                transferToAgent(a);
+            }));
+
+        if (!agentsBusy) item.click(function() {
+            agentsSelected = agentsSelected === i ? null : i;
+            renderAgents();
+        });
+
+        list.append(item);
+    });
+
+    var sel = agentsSelected !== null ? agents[agentsSelected] : null;
+    $("#agents_list").toggleClass('readonly', agentsBusy);
+    if (!agentsHintLocked)
+        $("#agents_hint").text(agentsBusy ? 'Pulsa el teléfono para pasar la llamada' : 'Selecciona un agente para llamar');
+    $("#agents_hint").toggle(!sel);
+    $("#agentscancelbtn").toggle(!!sel);
+    $("#agentsconfirmbtn").toggle(!!sel).text(sel ? 'Llamar a ' + sel.name.split(' ')[0] : '');
+}
+
+// Prefijo de escucha (eavesdrop de FusionPBX por defecto)
+function listenPrefix() {
+    if (typeof SARAPHONE_CONFIG !== 'undefined' && SARAPHONE_CONFIG.listenPrefix)
+        return SARAPHONE_CONFIG.listenPrefix;
+    return '*33';
+}
+
+// Con llamada activa no se puede usar doCall(): los providers cuelgan la llamada actual antes de marcar.
+// Si el provider implementa transfer(destino) se usa; si no, se avisa sin cortar la llamada.
+function transferToAgent(agent) {
+    if (!prov || typeof prov.transfer !== 'function') {
+        console.warn('Transferencia no soportada por el provider', cur_prov);
+        showAgentsHint('Transferencia no disponible en ' + cur_prov);
+        return;
+    }
+
+    showAgentsHint('Transfiriendo a ' + agent.name.split(' ')[0] + '...');
+    Promise.resolve(prov.transfer(agent.ext)).catch(function() {
+        showAgentsHint('No se ha podido transferir la llamada');
+    });
+}
+
+// Mensaje temporal en el pie de la pantalla de agentes
+function showAgentsHint(text) {
+    agentsHintLocked = true;
+    $("#agents_hint").text(text).show();
+    setTimeout(function() { agentsHintLocked = false; renderAgents(); }, 2500);
+}
+
+function showAgents(returnTo, busy) {
+    agentsReturnTo = returnTo;
+    agentsBusy = busy;
+    agentsSelected = null;
+    agentsOpenedAt = Date.now();
+    $("#dial").hide();
+    $("#incall").hide();
+    $("#agents").show();
+    renderAgents();
+    clearInterval(agentsTimer);
+    agentsTimer = setInterval(renderAgents, 1000);
+}
+
+function hideAgents() {
+    clearInterval(agentsTimer);
+    agentsTimer = null;
+    $("#agents").hide();
+}
+
+function callAgent(number) {
+    hideAgents();
+    $("#dial").show();
+    $("#ext").val(number);
+    $("#calling_input").val(number);
+    $("#callbtn").click();
+}
+
+$("#usersbtn").click(function() {
+    showAgents('#dial', false);
+});
+
+$("#usersringbtn").click(function() {
+    showAgents('#dial', true);
+});
+
+$("#usersincallbtn").click(function() {
+    showAgents('#incall', true);
+});
+
+$("#agentsbackbtn").click(function() {
+    hideAgents();
+    $(agentsReturnTo).show();
+});
+
+$("#agentscancelbtn").click(function() {
+    agentsSelected = null;
+    renderAgents();
+});
+
+$("#agentsconfirmbtn").click(function() {
+    var agents = getAgents();
+    if (agentsSelected === null || !agents[agentsSelected]) return;
+    callAgent(agents[agentsSelected].ext);
+});
 
 $("#hangupbtn").click(function() {
     prov.hangup();
@@ -646,6 +832,7 @@ $(window).load(function() {
     $("#signin").hide();
     $("#dial").hide();
     $("#incall").hide();
+    $("#agents").hide();
 
     $("#controls").hide();
     $("#dialadv1").hide();

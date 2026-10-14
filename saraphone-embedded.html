@@ -181,9 +181,9 @@ var audio_silence = new Audio("wav/silence.wav");
                             <div id="dialadv1"> 
                             </div> 
                             
-                            <div style="max-width: 95%; margin: -20px 0px 0px 0px; white-space: nowrap; overflow: hidden; text-overflow: clip;"> 
-                                <input id="ext" type="hidden" class="form-control input-lg" placeholder="number to dial (eg: 0549123456)" > 
-                                <h2 style="margin:0;"><span id="calling" style="font-size: 20px !important;">...</span></h2> 
+                            <div class="calling-display">
+                                <input id="ext" type="hidden" class="form-control input-lg" placeholder="number to dial (eg: 0549123456)" >
+                                <p style="margin:0;"><span id="calling"></span></p>
                             </div> 
                         </div>
                         <div class="webphone-profile-notifications">
@@ -244,9 +244,12 @@ var audio_silence = new Audio("wav/silence.wav");
                                     <span class="dial-number">#</span>
                                 </button>
 
-                                <div class="dial-actions">
+                                <div class="dial-actions dial-actions-3">
                                     <button class="dial-cancel" data-inline="true" id="rejcallbtn">Reject</button> 
                                     <button class="dial-call" data-inline="true" id="anscallbtn">Answer</button> 
+                                    <button class="dial-users" data-inline="true" id="usersringbtn" title="Agentes" aria-label="Agentes">
+                                        <img src="img/usuarios-alt.png" alt="Agentes">
+                                    </button>
                                 </div>
                             </div>                              
                         </div> 
@@ -345,7 +348,7 @@ var audio_silence = new Audio("wav/silence.wav");
                                     <span class="dial-number">#</span>
                                 </button>
 
-                                <div class="dial-actions">
+                                <div class="dial-actions dial-actions-3">
                                     <button class="dial-cancel" data-inline="true" id="delcallbtn" onclick="audio_silence.play()">
                                         Canc
                                     </button>
@@ -353,14 +356,39 @@ var audio_silence = new Audio("wav/silence.wav");
                                     <button class="dial-call" data-inline="true" id="callbtn" onclick="audio_silence.play()">
                                         ☎ Call
                                     </button>
+
+                                    <button class="dial-users" data-inline="true" id="usersbtn" title="Agentes" aria-label="Agentes">
+                                        <img src="img/usuarios-alt.png" alt="Agentes">
+                                    </button>
                                 </div>
                             </div>
                         </div> 
                     </div> 
                 </div> 
             </div>
-        </div> 
-        <div align="center" id="incall" class="form-signin-content"> 
+        </div>
+        <div align="center" id="agents" class="form-signin-content">
+            <div class="row">
+                <div id="webphone_body" class="agents-body">
+                    <div class="agents-header">
+                        <button class="agents-back" data-inline="true" id="agentsbackbtn" title="Volver" aria-label="Volver">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+                        </button>
+                        <div class="agents-title">Agentes</div>
+                        <span class="agents-role" id="agents_role">Controller</span>
+                    </div>
+
+                    <div class="agents-list" id="agents_list"></div>
+
+                    <div class="agents-footer">
+                        <span class="agents-hint" id="agents_hint">Selecciona un agente para llamar</span>
+                        <button class="agents-cancel" data-inline="true" id="agentscancelbtn">Cancel</button>
+                        <button class="agents-confirm" data-inline="true" id="agentsconfirmbtn"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div align="center" id="incall" class="form-signin-content">
             <div class="row"> 
                 <!-- <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" >  -->
                 <div id="webphone_body" > 
@@ -438,9 +466,12 @@ var audio_silence = new Audio("wav/silence.wav");
                                 <button class="dial-key" data-inline="true" id="dtmfpoundbtn" onclick="audio_hash.play()">
                                     <span class="dial-number">#</span>
                                 </button>
-                                <div class="dial-actions">
+                                <div class="dial-actions dial-actions-3">
                                     <button class="dial-mute" data-inline="true" id="mutebtn">Mute</button>
                                     <button class="dial-cancel" data-inline="true" id="hangupbtn">Hangup</button>
+                                    <button class="dial-users" data-inline="true" id="usersincallbtn" title="Agentes" aria-label="Agentes">
+                                        <img src="img/usuarios-alt.png" alt="Agentes">
+                                    </button>
                                 </div>
                             </div> 
                         </div> 

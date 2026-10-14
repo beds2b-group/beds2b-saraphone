@@ -2,3 +2,4 @@ config.js
 .env
 .env.*
 !.env.example
+agents frontend example/

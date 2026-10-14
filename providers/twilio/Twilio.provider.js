@@ -4,6 +4,8 @@ class TwilioProvider extends TelephonyProvider {
         super();
         // Twilio Function (saraphone-voice/functions/voice-token.js)
         this.tokenUrl = TELEPHONE_CONFIG.twilio.tokenUrl;
+        // Twilio Function (saraphone-voice/functions/transfer.js)
+        this.transferUrl = TELEPHONE_CONFIG.twilio.transferUrl;
         this.device = null;
         this.actualCall = null;
         this.identity = null;
@@ -119,7 +121,7 @@ class TwilioProvider extends TelephonyProvider {
         $("#ext").val("");
         var span = document.getElementById('calling');
         $("#calling_input").val("");
-        span.innerText = "...";
+        span.innerText = "";
 
         var span = document.getElementById('whoami');
         var txt = document.createTextNode($("#login").val());
@@ -149,6 +151,8 @@ class TwilioProvider extends TelephonyProvider {
         var telefono = this.actualCall.parameters.From;
         span.innerText = "CALL FROM: " + telefono;
 
+        hideAgents();
+        $("#dial").show();
         $("#isIncomingcall").show();
         $("#isNotIncomingcall").hide();
 
@@ -171,6 +175,7 @@ class TwilioProvider extends TelephonyProvider {
 
         $("#signin").hide();
         $("#dial").hide();
+        hideAgents();
         $("#incall").show();
 
         isOnMute = false;
@@ -181,8 +186,10 @@ class TwilioProvider extends TelephonyProvider {
         audioElement.pause();
 
         $("#signin").hide();
+        hideAgents();
         $("#dial").show();
         $("#incall").hide();
+        hideIncomingCall();
         $("#ext").val("");
 
         isOnMute = false;
@@ -192,6 +199,7 @@ class TwilioProvider extends TelephonyProvider {
 
     hangup() {
         $("#incall").hide();
+        hideAgents();
         $("#dial").show();
 
         isOnMute = false;
@@ -217,6 +225,29 @@ class TwilioProvider extends TelephonyProvider {
         this.#bindCallEvents(this.actualCall);
 
         $("#speakingwith").text(destination);
+    }
+
+    async transfer(target) {
+        if (!this.actualCall) {
+            console.warn("No hay llamada para transferir.");
+            return;
+        }
+
+        const callSid = this.actualCall.parameters.CallSid;
+        console.log("Transfiriendo", callSid, "a", target);
+
+        try {
+            await $.ajax({
+                url: this.transferUrl,
+                method: "POST",
+                data: { CallSid: callSid, identity: this.identity, target: target },
+                dataType: "json"
+            });
+
+        } catch (error) {
+            console.error("Error al transferir:", error.responseJSON || error);
+            throw error;
+        }
     }
 
     senddtmf(dtmf) {
