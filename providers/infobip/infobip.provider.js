@@ -115,7 +115,7 @@ class InfobipProvider extends TelephonyProvider {
         $("#ext").val("");
         var span = document.getElementById('calling');
         $("#calling_input").val("");
-        span.innerText = "...";
+        span.innerText = "";
         console.log("Conectado a Infobip");
 
         var span = document.getElementById('whoami');
@@ -145,6 +145,8 @@ class InfobipProvider extends TelephonyProvider {
         
         span.innerText = "CALL FROM: " + telefono;
         
+        hideAgents();
+        $("#dial").show();
         $("#isIncomingcall").show();
         $("#isNotIncomingcall").hide();
         
@@ -172,6 +174,7 @@ class InfobipProvider extends TelephonyProvider {
 
         $("#signin").hide();
         $("#dial").hide();
+        hideAgents();
         $("#incall").show();
 
         isOnMute = false;
@@ -187,11 +190,13 @@ class InfobipProvider extends TelephonyProvider {
         console.log('Onterminated');
         
         $("#signin").hide();
+        hideAgents();
         $("#dial").show();
         $("#incall").hide();
+        hideIncomingCall();
         $("#ext").val("");
 
-        this.terminateCurrCall();   
+        this.terminateCurrCall();
 
         isOnMute = false;
         incomingsession = null;

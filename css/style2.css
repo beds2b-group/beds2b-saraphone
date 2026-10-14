@@ -174,6 +174,26 @@ input.btn:hover, input.btn:active, input.btn:focus, input.button:hover,	input.bu
     margin-right: 7px;
 }
 
+.calling-display {
+    max-width: 95%;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+#calling {
+    font-size: 13px;
+    font-weight: normal;
+    line-height: 1.4;
+    color: #6b7480;
+}
+
+#calling:empty {
+    display: none;
+}
+
 .calling-body {
     display: flex;
     flex-direction: column;
@@ -385,8 +405,42 @@ input.btn:hover, input.btn:active, input.btn:focus, input.button:hover,	input.bu
 }
 
 #webphone_keypad .dial-cancel:active,
-#webphone_keypad .dial-call:active {
+#webphone_keypad .dial-call:active,
+#webphone_keypad .dial-users:active {
     transform: scale(0.96);
+}
+
+#webphone_keypad .dial-actions-3 {
+    grid-template-columns: 80px 1fr 50px;
+}
+
+#webphone_keypad .dial-users {
+    width: 50px;
+    height: 50px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 12px;
+    background: #3f8cff;
+    box-shadow: 0 8px 16px rgba(63, 140, 255, 0.28);
+
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+#webphone_keypad .dial-users:hover {
+    background: #2f7de1;
+}
+
+#webphone_keypad .dial-users img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
 }
 
 .btn-dial {
@@ -399,4 +453,303 @@ input.btn:hover, input.btn:active, input.btn:focus, input.button:hover,	input.bu
 
     color: #000;
     font-size: 20px;
+}
+/* agents */
+#agents .agents-body {
+    width: 100%;
+    max-width: 352px;
+    margin: 0 auto;
+    padding: 14px 16px 0 16px;
+
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+#agents .agents-header {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#agents .agents-back {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 10px;
+    background: #f4f7fa;
+    color: #4b5560;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+#agents .agents-back:hover {
+    background: #e9eef3;
+}
+
+#agents .agents-title {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 700;
+    color: #2f343b;
+}
+
+#agents .agents-role {
+    display: none;
+    padding: 4px 10px;
+
+    border-radius: 8px;
+    background: #e8f1ff;
+    color: #3f8cff;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+#agents .agents-list {
+    max-height: 360px;
+    margin-top: 14px;
+    padding-bottom: 10px;
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#agents .agent-item {
+    flex-shrink: 0;
+    padding: 9px 10px;
+
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background: #f4f7fa;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+#agents .agent-item:hover {
+    background: #e9eef3;
+}
+
+#agents .agent-item.selected {
+    border-color: #3f8cff;
+    background: #e8f1ff;
+}
+
+#agents .agent-avatar {
+    position: relative;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    background: #3f8cff;
+    color: #fff;
+
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+#agents .agent-dot {
+    position: absolute;
+    right: -1px;
+    bottom: 0;
+    width: 10px;
+    height: 10px;
+
+    border: 2px solid #f4f7fa;
+    border-radius: 50%;
+    background: rgb(29, 252, 29);
+}
+
+#agents .agent-dot.oncall {
+    background: #e4c84b;
+}
+
+#agents .agent-dot.away {
+    background: #9aa3ad;
+}
+
+#agents .agent-info {
+    flex: 1;
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#agents .agent-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2f343b;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#agents .agent-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    font-size: 12.5px;
+    color: #6f7a86;
+}
+
+#agents .agent-badge {
+    padding: 1px 6px;
+    border-radius: 6px;
+
+    font-size: 11.5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+#agents .agent-badge.available {
+    background: #e3f5ea;
+    color: #39aa68;
+}
+
+#agents .agent-badge.oncall {
+    background: #fbf3d4;
+    color: #a88a14;
+}
+
+#agents .agent-badge.away {
+    background: #e9eef3;
+    color: #6f7a86;
+}
+
+#agents .agent-listen {
+    height: 30px;
+    padding: 0 11px;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    border: none;
+    border-radius: 10px;
+    background: #fff;
+    color: #4b5560;
+
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+#agents .agent-listen:hover {
+    background: #e8f1ff;
+    color: #3f8cff;
+}
+
+#agents .agent-select {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 10px;
+    background: #fff;
+    color: #4b5560;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+#agents .agent-select:hover {
+    background: #39aa68;
+    color: #fff;
+}
+
+#agents .agents-empty {
+    padding: 24px 0;
+    text-align: center;
+    font-size: 13px;
+    color: #6f7a86;
+}
+
+#agents .agents-footer {
+    min-height: 66px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    border-top: 1px solid #e9eef3;
+}
+
+#agents .agents-hint {
+    font-size: 13px;
+    color: #9aa3ad;
+}
+
+#agents .agents-cancel,
+#agents .agents-confirm {
+    height: 44px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+#agents .agents-cancel {
+    width: 80px;
+    background: #ffe9e9;
+    color: #d84b4b;
+}
+
+#agents .agents-cancel:hover {
+    background: #ffdada;
+}
+
+#agents .agents-confirm {
+    flex: 1;
+    background: #39aa68;
+    color: #fff;
+    box-shadow: 0 8px 16px rgba(57, 170, 104, 0.28);
+}
+
+#agents .agents-confirm:hover {
+    background: #329b5e;
+}
+
+#agents .agents-cancel:active,
+#agents .agents-confirm:active,
+#agents .agents-back:active {
+    transform: scale(0.96);
+}
+
+#agents .agents-list.readonly .agent-item {
+    cursor: default;
+}
+
+#agents .agents-list.readonly .agent-item:hover {
+    background: #f4f7fa;
 }

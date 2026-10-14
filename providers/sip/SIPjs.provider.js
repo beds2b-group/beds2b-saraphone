@@ -186,6 +186,8 @@ class SIPjsProvider extends TelephonyProvider {
                 }
                 span.innerText = "CALL FROM: " + txt.textContent + " (" + s.remoteIdentity.uri.user.toString() + ")";
                 this.incomingsession = s;
+                hideAgents();
+                $("#dial").show();
                 $("#isIncomingcall").show();
                 $("#isNotIncomingcall").hide();
                 this.incomingsession.once('cancel', onCancelled.bind(this.incomingsession));
@@ -214,12 +216,13 @@ class SIPjsProvider extends TelephonyProvider {
         }
 
         $("#signin").hide();
+        hideAgents();
         $("#dial").show();
         $("#incall").hide();
         $("#ext").val("");
         var span = document.getElementById('calling');
         $("#calling_input").val("");
-        span.innerText = "...";
+        span.innerText = "";
 
             
         var span = document.getElementById('whoami');
@@ -324,7 +327,7 @@ class SIPjsProvider extends TelephonyProvider {
         cur_call.onHangup(function(reason) {
             var span = document.getElementById('calling');
             onTerminated(cur_call);
-            span.innerText = reason || "...";
+            span.innerText = reason || "";
         });
 
         var span = document.getElementById('speakingwith');
@@ -337,11 +340,13 @@ class SIPjsProvider extends TelephonyProvider {
         console.log('Onterminated');
         
         $("#signin").hide();
+        hideAgents();
         $("#dial").show();
         $("#incall").hide();
+        hideIncomingCall();
         $("#ext").val("");
 
-        this.terminateCurrCall();   
+        this.terminateCurrCall();
 
         isOnMute = false;
         incomingsession = null;
@@ -353,6 +358,7 @@ class SIPjsProvider extends TelephonyProvider {
 
         $("#signin").hide();
         $("#dial").hide();
+        hideAgents();
         $("#incall").show();
 
         isOnMute = false;

@@ -26,6 +26,8 @@ const TELEPHONE_CONFIG = {
   twilio: {
     // Twilio Function /voice-token. Local: npm start in saraphone-voice.
     // Local: http://localhost:3001/voice-token
-    tokenUrl: "https://saraphone-voice-7991-dev.twil.io/voice-token"
+    tokenUrl: "https://saraphone-voice-7991-dev.twil.io/voice-token",
+    // Local: http://localhost:3001/transfer
+    transferUrl: "https://saraphone-voice-7991-dev.twil.io/transfer"
   }
 }

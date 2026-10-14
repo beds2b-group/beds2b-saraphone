@@ -1,17 +1,3 @@
-/**
- *  Voice webhook (/voice)
- *
- *  Configure this URL as:
- *   - Phone number "A call comes in"  -> incoming calls ring every agent at once
- *   - TwiML App "Voice Request URL"   -> outgoing calls made from SaraPhone
- *
- *  Env vars:
- *   AGENT_IDENTITIES  comma separated SaraPhone logins, e.g. "55001,55002" (max 10)
- *   CALLER_ID         Twilio number used as caller id for outgoing calls
- *
- *  ".protected" makes Twilio validate X-Twilio-Signature, so only Twilio can call it.
- */
-
 const RING_TIMEOUT_SECONDS = 20;
 const MAX_CLIENTS_PER_DIAL = 10;
 
@@ -63,6 +49,15 @@ function handleIncoming(context, event, twiml) {
   agents.slice(0, MAX_CLIENTS_PER_DIAL).forEach((identity) => dial.client(identity));
 }
 
+// SaraPhone -> conference, via device.connect({ params: { conferenceName } })
+function handleConference(event, twiml) {
+  if (!/^[\w-]{1,64}$/.test(event.conferenceName)) {
+    say(twiml, 'El nombre de la conferencia no es válido.');
+    return;
+  }
+  twiml.dial().conference(event.conferenceName);
+}
+
 // Called via the Dial "action" once ringing the agents has finished
 function handleDialEnded(event, twiml) {
   if (event.DialCallStatus === 'completed') {
@@ -79,6 +74,8 @@ exports.handler = function (context, event, callback) {
 
   if (event.dialEnded) {
     handleDialEnded(event, twiml);
+  } else if (isFromSaraPhone && event.conferenceName) {
+    handleConference(event, twiml);
   } else if (isFromSaraPhone) {
     handleOutgoing(context, event, twiml);
   } else {
