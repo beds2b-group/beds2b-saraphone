@@ -1,10 +1,7 @@
-// Requires the Twilio Voice SDK loaded as a script (global Twilio.Device)
 class TwilioProvider extends TelephonyProvider {
     constructor() {
         super();
-        // Twilio Function (saraphone-voice/functions/voice-token.js)
         this.tokenUrl = TELEPHONE_CONFIG.twilio.tokenUrl;
-        // Twilio Function (saraphone-voice/functions/transfer.js)
         this.transferUrl = TELEPHONE_CONFIG.twilio.transferUrl;
         this.device = null;
         this.actualCall = null;
@@ -25,6 +22,8 @@ class TwilioProvider extends TelephonyProvider {
     async connect(username, displayName) {
         this.identity = username;
         const token = await this.#generateToken(username);
+
+        this.disconnect();
 
         this.device = new Twilio.Device(token, {
             logLevel: 1,
@@ -47,7 +46,8 @@ class TwilioProvider extends TelephonyProvider {
         });
 
         this.device.on("incoming", (call) => {
-            if (this.actualCall) {
+            if (this.isCurrentActiveCall()) {
+                console.warn("Llamada entrante rechazada: ya hay una llamada en curso", this.actualCall.parameters.CallSid);
                 call.reject();
                 return;
             }
@@ -62,33 +62,63 @@ class TwilioProvider extends TelephonyProvider {
         await this.device.register();
     }
 
+    #guardAudioTeardown(call) {
+        const media = call._mediaHandler;
+        if (!media || media._saraphoneGuarded) return;
+        media._saraphoneGuarded = true;
+
+        const disableOutput = media._disableOutput;
+        media._disableOutput = function (pc, id) {
+            const output = pc.outputs.get(id);
+            if (output && output.audio && typeof output.audio.pause !== "function") {
+                console.warn("Salida de audio no válida en el SDK de Twilio, se omite:", id, output.audio);
+                if (output.dest) output.dest.disconnect();
+                return;
+            }
+            return disableOutput.call(this, pc, id);
+        };
+
+        const close = media.close;
+        media.close = function () {
+            try {
+                return close.apply(this, arguments);
+            } catch (error) {
+                console.error("Error al cerrar el audio de la llamada, se fuerza el cierre:", error);
+                if (this.status !== "closed") {
+                    this.status = "closed";
+                    this.onclose();
+                }
+            }
+        };
+    }
+
     #bindCallEvents(call) {
+        this.#guardAudioTeardown(call);
+
         call.on("accept", () => {
+            if (this.actualCall !== call) return;
             console.log("Llamada establecida");
             this.onAccepted();
         });
 
         call.on("disconnect", () => {
             console.log("Llamada finalizada");
-            this.actualCall = null;
-            this.onTerminated();
+            this.#endCall(call);
         });
 
-        call.on("cancel", () => {
-            this.actualCall = null;
-            this.onTerminated();
-        });
-
-        call.on("reject", () => {
-            this.actualCall = null;
-            this.onTerminated();
-        });
+        call.on("cancel", () => this.#endCall(call));
+        call.on("reject", () => this.#endCall(call));
 
         call.on("error", (error) => {
             console.error("Error en llamada:", error);
-            this.actualCall = null;
-            this.onTerminated();
+            if (call.status() === "closed") this.#endCall(call);
         });
+    }
+
+    #endCall(call) {
+        if (this.actualCall !== call) return;
+        this.actualCall = null;
+        this.onTerminated();
     }
 
     answer() {
@@ -201,15 +231,21 @@ class TwilioProvider extends TelephonyProvider {
         $("#incall").hide();
         hideAgents();
         $("#dial").show();
+        resetCallingVars();
 
         isOnMute = false;
         this.terminateCurrCall();
     }
 
     terminateCurrCall() {
-        if (!this.actualCall) return;
-        this.actualCall.disconnect();
+        const call = this.actualCall;
         this.actualCall = null;
+
+        if (call && call.status() === "pending") 
+            call.reject();
+
+        if (!this.device) return;
+        this.device.disconnectAll();
     }
 
     async doCall() {
@@ -260,6 +296,6 @@ class TwilioProvider extends TelephonyProvider {
     }
 
     isCurrentActiveCall() {
-        return this.actualCall !== null;
+        return this.actualCall !== null && this.actualCall.status() !== "closed";
     }
 }
