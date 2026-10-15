@@ -84,8 +84,6 @@ window.addEventListener("keydown", function (event) {
 });
 
 window.addEventListener("message", function(event) {
-
-    // Cambia esto por el dominio real de Zammad
     var allowedOrigins = [
         "https://zammad.senator.tools",
         "http://localhost:3000",
@@ -163,7 +161,6 @@ var beep = (function() {
 
         duration = +duration;
 
-        // Only 0-4 are valid types.
         type = (type % 5) || 0;
 
         if (typeof finishedCallback != "function") {
@@ -172,16 +169,15 @@ var beep = (function() {
 
         var osc = ctx.createOscillator();
 
-        //osc.type = type;
         osc.type = "sine";
 
         osc.connect(ctx.destination);
-        if (osc.noteOn) osc.noteOn(0); // old browsers
-        if (osc.start) osc.start(); // new browsers
+        if (osc.noteOn) osc.noteOn(0);
+        if (osc.start) osc.start();
 
         setTimeout(function() {
-            if (osc.noteOff) osc.noteOff(0); // old browsers
-            if (osc.stop) osc.stop(); // new browsers
+            if (osc.noteOff) osc.noteOff(0);
+            if (osc.stop) osc.stop();
             finishedCallback();
         }, duration);
 
@@ -357,9 +353,6 @@ $("#delcallbtn").click(function() {
 });
 
 
-//AGENTS
-// Lista de agentes: SARAPHONE_CONFIG.agents = [{ name, ext, status: 'available'|'oncall'|'away', since }]
-// "since" son los segundos que lleva en llamada. SARAPHONE_CONFIG.role = 'controller' activa Listen.
 var defaultAgents = [
     { name: 'Laura Gómez', ext: '55002', status: 'available' },
     { name: 'Marc Puig', ext: '55003', status: 'oncall', since: 225 },
@@ -374,8 +367,7 @@ var agentsSelected = null;
 var agentsTimer = null;
 var agentsOpenedAt = 0;
 var agentsReturnTo = '#dial';
-// Abierta desde ringing u oncall: cada agente muestra su botón de llamada y no se selecciona.
-// Abierta desde dial: sin botón por agente, se selecciona y se llama desde el pie.
+
 var agentsBusy = false;
 var agentsHintLocked = false;
 
@@ -458,15 +450,12 @@ function renderAgents() {
     $("#agentsconfirmbtn").toggle(!!sel).text(sel ? 'Llamar a ' + sel.name.split(' ')[0] : '');
 }
 
-// Prefijo de escucha (eavesdrop de FusionPBX por defecto)
 function listenPrefix() {
     if (typeof SARAPHONE_CONFIG !== 'undefined' && SARAPHONE_CONFIG.listenPrefix)
         return SARAPHONE_CONFIG.listenPrefix;
     return '*33';
 }
 
-// Con llamada activa no se puede usar doCall(): los providers cuelgan la llamada actual antes de marcar.
-// Si el provider implementa transfer(destino) se usa; si no, se avisa sin cortar la llamada.
 function transferToAgent(agent) {
     if (!prov || typeof prov.transfer !== 'function') {
         console.warn('Transferencia no soportada por el provider', cur_prov);
@@ -480,7 +469,6 @@ function transferToAgent(agent) {
     });
 }
 
-// Mensaje temporal en el pie de la pantalla de agentes
 function showAgentsHint(text) {
     agentsHintLocked = true;
     $("#agents_hint").text(text).show();
@@ -604,16 +592,24 @@ $("#recordcallbtn").click(function() {
     isRecording = !isRecording;
 });
 
+// Marca visualmente los botones de tipo interruptor (DND, Mute Ring, Auto Answer)
+function setToggleState(btn, isOn) {
+    $(btn).toggleClass('is-active', isOn).attr('aria-pressed', isOn);
+}
+
 $("#dndbtn").click(function() {
     isDnd = !isDnd;
+    setToggleState(this, isDnd);
 });
 
 $("#ringbtn").click(function() {
     isNoRing = !isNoRing;
+    setToggleState(this, isNoRing);
 });
 
 $("#autoanswerbtn").click(function() {
     isAutoAnswer = !isAutoAnswer;
+    setToggleState(this, isAutoAnswer);
 });
 
 //DIAL BUTTONS LOGIC - INCOMING CALL
