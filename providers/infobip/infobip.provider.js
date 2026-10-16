@@ -144,7 +144,8 @@ class InfobipProvider extends TelephonyProvider {
         console.log(telefono);
         
         span.innerText = "CALL FROM: " + telefono;
-        
+        $("#speakingwith").text(telefono);
+
         hideAgents();
         $("#dial").show();
         $("#isIncomingcall").show();
@@ -195,6 +196,7 @@ class InfobipProvider extends TelephonyProvider {
         $("#incall").hide();
         hideIncomingCall();
         $("#ext").val("");
+        $("#speakingwith").text("...");
 
         this.terminateCurrCall();
 

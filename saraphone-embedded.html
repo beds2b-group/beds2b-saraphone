@@ -67,100 +67,101 @@ var audio_silence = new Audio("wav/silence.wav");
 <div class="" style="height: 100%; background-color: white;" > 
     <div class="col-8 col-sm-8 col-md-8 col-lg-8 col-xl-8" style="height: 100%; width: 100%;"> 
         <div align="center" class="form-signin"> 
-            <div align="center" id="signin" class="form-signin-content"> 
-                <div class="row"> 
-                    <!-- <div class="" >  -->
-                        <div id="webphone_body"> 
-                            <br/>  
-                            <br/>  
-                            <input id="login" style="max-width: 380px;" class="form-control input-md" placeholder="Your Account Login (eg: 2020)" required autofocus>
-                            <br/>  
-                            <input id="passwd" style="max-width: 380px;" type="password" class="form-control input-md" placeholder="Your Account Password (eg: 12345)" required> 
-                            <br/>  
-                            <input id="yourname" style="max-width: 380px;" type="text" class="form-control input-md" placeholder="Your Display Name (optional, eg: Giovanni Maruzzelli)"  required> 
-                            <br/>  
-                            <button class="btn btn-sm btn-primary btn-default" data-inline="true" id="signinctrlbtn">Advanced</button> 
-                            <br/> 
-                            &nbsp; 
-                            <br/> 
-                            <div id="signinadv1" align="center" style="text-shadow:0 0px 0px rgba(0,0,0,.5);"> 
-                                <table> 
+            <div id="signin" class="form-signin-content">
+                <div class="login-card">
+                    <div class="login-header">
+                        <div class="login-logo">&#9742;</div>
+                        <div class="login-title">Iniciar sesión</div>
+                        <div class="login-subtitle">Senator Agent · Softphone</div>
+                    </div>
+                        <div class="login-form">
+                            <label class="login-field" for="login">Extensión</label>
+                            <input id="login" class="login-input" inputmode="numeric" placeholder="ej: 55001" required autofocus>
+                            <!-- Solo visible con SIP.js: saraphone.js lo oculta con el resto de providers -->
+                            <input id="passwd" type="password" class="login-input" placeholder="Contraseña" required>
+                            <label class="login-field" for="yourname">Nombre <span class="login-optional">(opcional)</span></label>
+                            <input id="yourname" type="text" class="login-input" placeholder="ej: Laura Gómez"  required>
+                            <div class="login-options">
+                                <button type="button" class="login-link" data-inline="true" id="signinctrlbtn">Avanzado</button>
+                            </div>
+                            <div id="signinadv1" class="login-advanced">
+                                <table>
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="domain"  /></td><td>&nbsp;SIP&nbsp;Domain&nbsp;Name&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="domain"  /></td><td>&nbsp;SIP&nbsp;Domain&nbsp;Name&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="proxy" /></td><td>&nbsp;WSS&nbsp;Proxy&nbsp;Name&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="proxy" /></td><td>&nbsp;WSS&nbsp;Proxy&nbsp;Name&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="port" value="" /></td><td>&nbsp;WSS&nbsp;Proxy&nbsp;Port&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="port" value="" /></td><td>&nbsp;WSS&nbsp;Proxy&nbsp;Port&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres1" value="" /></td><td>&nbsp;BLF1&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="pres1" value="" /></td><td>&nbsp;BLF1&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres1_label" value="" /></td><td>&nbsp;BLF1&nbsp;Label</td> 
+                                        <td> <input class="login-input" size=25 id="pres1_label" value="" /></td><td>&nbsp;BLF1&nbsp;Label</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres2" value="" /></td><td>&nbsp;BLF2&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="pres2" value="" /></td><td>&nbsp;BLF2&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres2_label" value="" /></td><td>&nbsp;BLF2&nbsp;Label</td> 
+                                        <td> <input class="login-input" size=25 id="pres2_label" value="" /></td><td>&nbsp;BLF2&nbsp;Label</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres3" value="" /></td><td>&nbsp;BLF3&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="pres3" value="" /></td><td>&nbsp;BLF3&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres3_label" value="" /></td><td>&nbsp;BLF3&nbsp;Label</td> 
+                                        <td> <input class="login-input" size=25 id="pres3_label" value="" /></td><td>&nbsp;BLF3&nbsp;Label</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres4" value="" /></td><td>&nbsp;BLF4&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="pres4" value="" /></td><td>&nbsp;BLF4&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres4_label" value="" /></td><td>&nbsp;BLF4&nbsp;Label</td> 
+                                        <td> <input class="login-input" size=25 id="pres4_label" value="" /></td><td>&nbsp;BLF4&nbsp;Label</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres5" value="" /></td><td>&nbsp;BLF5&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="pres5" value="" /></td><td>&nbsp;BLF5&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres5_label" value="" /></td><td>&nbsp;BLF5&nbsp;Label</td> 
+                                        <td> <input class="login-input" size=25 id="pres5_label" value="" /></td><td>&nbsp;BLF5&nbsp;Label</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres6" value="" /></td><td>&nbsp;BLF6&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="pres6" value="" /></td><td>&nbsp;BLF6&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres6_label" value="" /></td><td>&nbsp;BLF6&nbsp;Label</td> 
+                                        <td> <input class="login-input" size=25 id="pres6_label" value="" /></td><td>&nbsp;BLF6&nbsp;Label</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres7" value="" /></td><td>&nbsp;BLF7&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="pres7" value="" /></td><td>&nbsp;BLF7&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres7_label" value="" /></td><td>&nbsp;BLF7&nbsp;Label</td> 
+                                        <td> <input class="login-input" size=25 id="pres7_label" value="" /></td><td>&nbsp;BLF7&nbsp;Label</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres8" value="" /></td><td>&nbsp;BLF8&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="pres8" value="" /></td><td>&nbsp;BLF8&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres8_label" value="" /></td><td>&nbsp;BLF8&nbsp;Label</td> 
+                                        <td> <input class="login-input" size=25 id="pres8_label" value="" /></td><td>&nbsp;BLF8&nbsp;Label</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres9" value="" /></td><td>&nbsp;BLF9&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="pres9" value="" /></td><td>&nbsp;BLF9&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres9_label" value="" /></td><td>&nbsp;BLF9&nbsp;Label</td> 
+                                        <td> <input class="login-input" size=25 id="pres9_label" value="" /></td><td>&nbsp;BLF9&nbsp;Label</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres10" value="" /></td><td>&nbsp;BLF10&nbsp;</td> 
+                                        <td> <input class="login-input" size=25 id="pres10" value="" /></td><td>&nbsp;BLF10&nbsp;</td> 
                                     </tr> 
                                     <tr> 
-                                        <td> <input style="background-color: black;" size=25 id="pres10_label" value="" /></td><td>&nbsp;BLF10&nbsp;Label</td> 
+                                        <td> <input class="login-input" size=25 id="pres10_label" value="" /></td><td>&nbsp;BLF10&nbsp;Label</td> 
                                     </tr> 
                                 </table> 
                             </div> 
-                            <button class="btn btn-md btn-primary btn-success" data-inline="true" id="loginbtn">Login</button> 
-                            <!-- <button class="btn btn-md btn-primary btn-danger" data-inline="true" id="gotopanel2" style="margin-bottom: 0px; width: 160px !important;" >Back to Login</button>  --> 
-                        <!-- </div>  -->
-                    </div> 
-                </div> 
+                            <button type="button" class="login-submit" data-inline="true" id="loginbtn">Entrar</button>
+                            <!-- <button class="btn btn-md btn-primary btn-danger" data-inline="true" id="gotopanel2" style="margin-bottom: 0px; width: 160px !important;" >Back to Login</button>  -->
+                        </div>
+                    <div class="login-footer">¿Problemas para entrar? Contacta a soporte</div>
+                </div>
             </div> 
         </div> 
         <div align="center" id="dial" class="form-signin-content"> 
@@ -280,6 +281,11 @@ var audio_silence = new Audio("wav/silence.wav");
                                     <button class="btn webphone-icon-btn" data-inline="true" id="ringbtn" onclick="audio1.play()" title="Silenciar timbre" aria-label="Silenciar timbre">
                                         <img src="img/corte-de-campana.png" alt="Mute Ring">
                                         <span>Mute</span>
+                                    </button>
+
+                                    <button class="btn webphone-icon-btn" data-inline="true" id="pausebtn" onclick="audio1.play()" title="Pausar llamada" aria-label="Pausar llamada">
+                                        <img src="img/pausa.png" alt="Pause">
+                                        <span>Pausa</span>
                                     </button>
 
                                     <!-- <button class="btn webphone-icon-btn" data-inline="true" id="autoanswerbtn" onclick="audio1.play()" title="Auto responder" aria-label="Auto responder">
@@ -407,7 +413,7 @@ var audio_silence = new Audio("wav/silence.wav");
                             </div> 
                             
                             <div style="max-width: 95%; white-space: nowrap; overflow: hidden; text-overflow: clip;"> 
-                                <h2 style="font-size: 20px !important; text-align: left;"><span id="speakingwith" style="color: black;">...</span></h2> 
+                                <h2 style="font-size: 20px !important; text-align: left; margin-top: 5px;"><span id="speakingwith" style="color: black;">...</span></h2> 
                             </div> 
                             
                         </div>

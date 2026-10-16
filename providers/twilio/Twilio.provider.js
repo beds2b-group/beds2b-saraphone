@@ -180,6 +180,7 @@ class TwilioProvider extends TelephonyProvider {
 
         var telefono = this.actualCall.parameters.From;
         span.innerText = "CALL FROM: " + telefono;
+        $("#speakingwith").text(telefono);
 
         hideAgents();
         $("#dial").show();
@@ -221,6 +222,7 @@ class TwilioProvider extends TelephonyProvider {
         $("#incall").hide();
         hideIncomingCall();
         $("#ext").val("");
+        $("#speakingwith").text("...");
 
         isOnMute = false;
         incomingsession = null;
