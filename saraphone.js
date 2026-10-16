@@ -47,6 +47,7 @@ var isRecording = false;
 var isDnd = false;
 var isNoRing = false;
 var isAutoAnswer = false;
+var isPaused = false;
 var autoAnswerOnce = false;
 var isRegistered = false;
 var vmail_subscription = false;
@@ -605,6 +606,11 @@ $("#dndbtn").click(function() {
 $("#ringbtn").click(function() {
     isNoRing = !isNoRing;
     setToggleState(this, isNoRing);
+});
+
+$("#pausebtn").click(function() {
+    isPaused = !isPaused;
+    setToggleState(this, isPaused);
 });
 
 $("#autoanswerbtn").click(function() {
