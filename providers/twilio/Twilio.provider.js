@@ -15,7 +15,6 @@ class TwilioProvider extends TelephonyProvider {
             data: { identity: identity },
             dataType: "json"    
         });
-        console.log(response.token);
         return response.token;
     }
 
