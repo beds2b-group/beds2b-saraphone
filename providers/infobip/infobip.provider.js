@@ -1,7 +1,8 @@
 class InfobipProvider extends TelephonyProvider {
     constructor() {
         super();
-        this.baseUrl = 'https://d86wng.api.infobip.com/';
+        // Proxy de nginx: inyecta Authorization con INFOBIP_API_KEY del .env
+        this.baseUrl = '/api/infobip/';
         this.callsQueue = [];
         this.actualCall = null;
     }
@@ -13,7 +14,6 @@ class InfobipProvider extends TelephonyProvider {
             "method": "POST",
             "timeout": 0,
             "headers": {
-                "Authorization": "App e8cce4f7f30c26f0dbfaf0b46429dadf-08eaf429-de11-4c17-be63-75503008c4c3",
                 "Content-Type": "application/json"
             },
             "data": JSON.stringify({
