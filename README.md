@@ -271,3 +271,15 @@ SCREENSHOTS !
 ![saraphone_01](https://user-images.githubusercontent.com/331862/79241436-5758d600-7e73-11ea-92ce-7522db44fe63.jpg)
 ![saraphone_02](https://user-images.githubusercontent.com/331862/79241434-5627a900-7e73-11ea-8196-549379e603ec.jpg)
 ![saraphone_03](https://user-images.githubusercontent.com/331862/79241430-558f1280-7e73-11ea-9994-c8b9d48a587d.jpg)
+
+## Configuración local (beds2b)
+
+`config.js` **no se versiona**: se sirve tal cual al navegador y no debe contener credenciales.
+Antes de arrancar o de construir la imagen Docker, crea el fichero a partir de la plantilla:
+
+```bash
+cp config.example.js config.js
+```
+
+Las variables de Infobip del `docker-compose.yml` se leen de un fichero `.env` (tampoco versionado);
+`.env.example` solo lista los nombres.
